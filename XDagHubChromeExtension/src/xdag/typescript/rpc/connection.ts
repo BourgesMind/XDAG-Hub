@@ -2,8 +2,6 @@
 interface ConnectionOptions {
   fullnode: string;
   websocket?: string;
-  /** @deprecated Use the new faucet APIs from `/Xdag.js/faucet` instead. */
-  faucet?: string;
 }
 
 export class Connection {
@@ -21,25 +19,18 @@ export class Connection {
     return this.#options.websocket || this.#options.fullnode;
   }
 
-  /** @deprecated Use the new faucet APIs from `/Xdag.js/faucet` instead. */
-  get faucet() {
-    return this.#options.faucet;
-  }
 }
 
 export const localnetConnection = new Connection({
-  fullnode: "http://127.0.0.1:9000",
-  faucet: "",
+  fullnode: "http://127.0.0.1:10001",
 });
 
 export const devnetConnection = new Connection({
-  fullnode: "https://testnet-rpc.xdagj.org",
-  faucet: "",
+  fullnode: "https://devnet-rpc.xdagj.org",
 });
 
 export const testnetConnection = new Connection({
   fullnode: "https://testnet-rpc.xdagj.org",
-  faucet: "",
 });
 
 export const mainnetConnection = new Connection({

@@ -30,7 +30,6 @@ import { AccountSelector } from "_src/ui/app/components/AccountSelector";
 import { usePinnedCoinTypes } from "_src/ui/app/hooks/usePinnedCoinTypes";
 import { useRecognizedPackages } from "_src/ui/app/hooks/useRecognizedPackages";
 import PageTitle from "_src/ui/app/shared/PageTitle";
-import FaucetRequestButton from "_src/ui/app/shared/faucet/FaucetRequestButton";
 import {
 	XDAG_TYPE_ARG,
 	Coin,
@@ -163,7 +162,6 @@ function MyTokens() {
 
 			{ noXdagToken ? (
 				<div className="flex flex-col flex-nowrap justify-center items-center gap-2 text-center mt-6 px-2.5">
-					<FaucetRequestButton/>
 					<Text variant="pBodySmall" color="gray-80" weight="normal">
 						To conduct transactions on the XDAG network, you need XDAG in your wallet.
 					</Text>

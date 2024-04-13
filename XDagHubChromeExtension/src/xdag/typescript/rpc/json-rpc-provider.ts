@@ -55,18 +55,6 @@ export class JsonRpcProvider
 	}
 
 
-	/** @deprecated Use `/Xdag.js/faucet` instead. */
-	async requestXDagFromFaucet( recipient: XDagAddress, headers?: HttpHeaders ) {
-		if ( !this.connection.faucet ) {
-			throw new Error( "Faucet URL is not specified" );
-		}
-		return requestXdagFromFaucetV0( {
-			host: this.connection.faucet,
-			recipient,
-			headers,
-		} );
-	}
-
 	async getCoins( input: { owner: XDagAddress; coinType?: string | null; } ): Promise<PaginatedCoins> {
 		let address = normalizeXDagAddress( input.owner );
 		const postBody = {
