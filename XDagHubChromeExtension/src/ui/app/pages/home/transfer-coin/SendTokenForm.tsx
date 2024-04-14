@@ -103,7 +103,7 @@ export function SendTokenForm( { coinType, onSubmit, initialAmount = "", initial
 	const hasEnoughBalance = ( values: any ) => {
 		if ( !(values.amount) ) return true;
 		if ( values.isPayAllXDag ) return true;
-		return XDagBalance >= parseAmount( values.amount, 0 );
+		return XDagBalance.isGreaterThanOrEqualTo(parseAmount( values.amount, 0 ));
 	}
 
 

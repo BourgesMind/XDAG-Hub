@@ -5,7 +5,7 @@ import type { XDagAddress } from "_src/xdag/typescript/types";
 const API_ENV_TO_EXPLORER_ENV: Record<API_ENV, string | undefined> = {
   [API_ENV.local]: "local",
   // [API_ENV.devNet]: "devnet",
-  [API_ENV.testNet]: "testnet",
+  [API_ENV.testNet]: "https://testnet-explorer.xdagj.org",
   [API_ENV.mainnet]: "https://mainnet-explorer.xdagj.org",
   [API_ENV.customRPC]: "",
 };
