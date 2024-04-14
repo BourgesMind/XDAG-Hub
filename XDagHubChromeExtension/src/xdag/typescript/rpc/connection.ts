@@ -25,9 +25,9 @@ export const localnetConnection = new Connection({
   fullnode: "http://127.0.0.1:10001",
 });
 
-export const devnetConnection = new Connection({
-  fullnode: "https://devnet-rpc.xdagj.org",
-});
+// export const devnetConnection = new Connection({
+//   fullnode: "https://devnet-rpc.xdagj.org",
+// });
 
 export const testnetConnection = new Connection({
   fullnode: "https://testnet-rpc.xdagj.org",

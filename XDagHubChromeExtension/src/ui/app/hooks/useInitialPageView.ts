@@ -9,7 +9,6 @@ export function useInitialPageView() {
   const { apiEnv, customRPC, activeOrigin, appType } = useAppSelector(
     (state) => state.app,
   );
-  const activeNetwork =
-    customRPC && apiEnv === "customRPC" ? customRPC : apiEnv.toUpperCase();
+  const activeNetwork = customRPC && apiEnv === "customRPC" ? customRPC : apiEnv.toUpperCase();
   const isFullScreen = appType === AppType.fullscreen;
 }

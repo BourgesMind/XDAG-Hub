@@ -18,7 +18,7 @@ type EnvInfo = {
 
 export const API_ENV_TO_INFO: Record<API_ENV, EnvInfo> = {
 	[API_ENV.local]: { name: "Local", env: API_ENV.local },
-	[API_ENV.devNet]: { name: "Devnet", env: API_ENV.devNet },
+	// [API_ENV.devNet]: { name: "Devnet", env: API_ENV.devNet },
 	[API_ENV.customRPC]: { name: "Custom RPC", env: API_ENV.customRPC },
 	[API_ENV.testNet]: { name: "Testnet", env: API_ENV.testNet },
 	[API_ENV.mainnet]: { name: "Mainnet", env: API_ENV.mainnet },
@@ -27,7 +27,7 @@ export const API_ENV_TO_INFO: Record<API_ENV, EnvInfo> = {
 export const ENV_TO_API: Record<API_ENV, Connection | null> = {
 	[API_ENV.customRPC]: null,
 	[API_ENV.local]: new Connection({ fullnode: process.env.API_ENDPOINT_LOCAL_FULLNODE || "", }),
-	[API_ENV.devNet]: new Connection({ fullnode: process.env.API_ENDPOINT_DEV_NET_FULLNODE || "", }),
+	// [API_ENV.devNet]: new Connection({ fullnode: process.env.API_ENDPOINT_DEV_NET_FULLNODE || "", }),
 	[API_ENV.testNet]: new Connection({ fullnode: process.env.API_ENDPOINT_TEST_NET_FULLNODE || "", }),
 	[API_ENV.mainnet]: new Connection({ fullnode: process.env.API_ENDPOINT_MAINNET_FULLNODE || "", }),
 };
@@ -37,7 +37,7 @@ function getDefaultApiEnv() {
 	if (apiEnv && !Object.keys(API_ENV).includes(apiEnv)) {
 		throw new Error(`Unknown environment variable API_ENV, ${apiEnv}`);
 	}
-	return apiEnv ? API_ENV[apiEnv as keyof typeof API_ENV] : API_ENV.devNet;
+	return apiEnv ? API_ENV[apiEnv as keyof typeof API_ENV] : API_ENV.mainnet;
 }
 
 function getDefaultAPI(env: API_ENV) {

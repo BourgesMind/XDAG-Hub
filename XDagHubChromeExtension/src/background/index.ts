@@ -117,17 +117,9 @@ if (!isSessionStorageSupported()) {
 }
 
 NetworkEnv.getActiveNetwork().then(async ({ env, customRpcUrl }) => {
-  // setAttributes({
-  //   apiEnv: env,
-  //   customRPC: customRpcUrl,
-  // });
 });
 
 NetworkEnv.on("changed", async (network) => {
-  // setAttributes({
-  //   apiEnv: network.env,
-  //   customRPC: network.customRpcUrl,
-  // });
   connections.notifyUI({ event: "networkChanged", network });
   connections.notifyContentScript({
     event: "walletStatusChange",

@@ -1,6 +1,6 @@
 import { requestXdagFromFaucetV0 } from "../faucet";
 import { JsonRpcClient } from "./client";
-import { devnetConnection, mainnetConnection } from "./connection";
+import { mainnetConnection } from "./connection";
 import { DEFAULT_CLIENT_OPTIONS, WebsocketClient } from "./websocket-client";
 import {
 	XDagAddress,

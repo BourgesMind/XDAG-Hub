@@ -53,7 +53,7 @@ type StakeInput = { validatorAddress: string };
 type ChainType = Wallet["chains"][number];
 const API_ENV_TO_CHAIN: Record<Exclude<API_ENV, API_ENV.customRPC>, ChainType> = {
 	[ API_ENV.local ]: XDAG_LOCALNET_CHAIN,
-	[ API_ENV.devNet ]: XDAG_DEVNET_CHAIN,
+	// [ API_ENV.devNet ]: XDAG_DEVNET_CHAIN,
 	[ API_ENV.testNet ]: XDAG_TESTNET_CHAIN,
 	[ API_ENV.mainnet ]: XDAG_MAINNET_CHAIN,
 };
