@@ -17,7 +17,7 @@ export function SignMessageRequest({ request }: SignMessageRequestProps) {
     () => toUtf8OrB64(request.tx.message),
     [request.tx.message],
   );
-  const signer = useSigner(request.tx.accountAddress);
+  const signer = useSigner();
   const dispatch = useAppDispatch();
   // const { clientIdentifier, notificationModal } = useQredoTransaction(true);
 

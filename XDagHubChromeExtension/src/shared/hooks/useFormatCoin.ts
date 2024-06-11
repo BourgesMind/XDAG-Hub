@@ -3,7 +3,7 @@ import BigNumber from "bignumber.js";
 import { useMemo } from "react";
 import { formatAmount } from "../utils/formatAmount";
 import { useRpcClient } from "_src/xdag/api";
-import { Coin, type CoinMetadata, XDAG_TYPE_ARG } from "_src/xdag/typescript/framework";
+import { type CoinMetadata, XDAG_TYPE_ARG, CoinAPI } from "_src/xdag/typescript/framework";
 
 type FormattedCoin = [
 	formattedBalance: string,
@@ -75,7 +75,7 @@ export function useCoinMetadata( coinType?: string | null ) {
 export function useFormatCoin( balance?: BigNumber, coinType?: string | null, format: CoinFormat = CoinFormat.ROUNDED, ): FormattedCoin {
 
 	const fallbackSymbol = useMemo(
-		() => (coinType ? Coin.getCoinSymbol( coinType ) : "")
+		() => (coinType ? CoinAPI.getCoinSymbol( coinType ) : "")
 		, [ coinType ]
 	);
 

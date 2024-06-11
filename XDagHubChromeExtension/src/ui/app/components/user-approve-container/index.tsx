@@ -1,9 +1,9 @@
 import cl from "classnames";
-import {useCallback, useMemo, useState} from "react";
-import {Button} from "../../shared/ButtonUI";
-import {DAppInfoCard} from "../DAppInfoCard";
-import type {XDagAddress} from "_src/xdag/typescript/types";
-import type {ReactNode} from "react";
+import { useCallback, useMemo, useState } from "react";
+import { Button } from "../../shared/ButtonUI";
+import { DAppInfoCard } from "../DAppInfoCard";
+import type { XDagAddress } from "_src/xdag/typescript/types";
+import type { ReactNode } from "react";
 import st from "./UserApproveContainer.module.scss";
 
 type UserApproveContainerProps = {
@@ -23,20 +23,20 @@ type UserApproveContainerProps = {
 };
 
 export function UserApproveContainer({
-                                         origin,
-                                         originFavIcon,
-                                         children,
-                                         rejectTitle,
-                                         approveTitle,
-                                         approveDisabled = false,
-                                         approveLoading = false,
-                                         onSubmit,
-                                         isWarning,
-                                         addressHidden = false,
-                                         address,
-                                         scrollable,
-                                         blended = false,
-                                     }: UserApproveContainerProps) {
+    origin,
+    originFavIcon,
+    children,
+    rejectTitle,
+    approveTitle,
+    approveDisabled = false,
+    approveLoading = false,
+    onSubmit,
+    isWarning,
+    addressHidden = false,
+    address,
+    scrollable,
+    blended = false,
+}: UserApproveContainerProps) {
     const [submitting, setSubmitting] = useState(false);
     const handleOnResponse = useCallback(
         async (allowed: boolean) => {
@@ -51,7 +51,7 @@ export function UserApproveContainer({
 
     return (
         <div className={st.container}>
-            <div className={cl(st.scrollBody, {[st.scrollable]: scrollable})}>
+            <div className={cl(st.scrollBody, { [st.scrollable]: scrollable })}>
                 <DAppInfoCard
                     name={parsedOrigin.host}
                     url={origin}
@@ -75,19 +75,19 @@ export function UserApproveContainer({
                     })}
                 >
                     <Button size="tall" variant="warning"
-                            onClick={() => {
-                                handleOnResponse(false);
-                            }}
-                            disabled={submitting}
-                            text={rejectTitle}
+                        onClick={() => {
+                            handleOnResponse(false);
+                        }}
+                        disabled={submitting}
+                        text={rejectTitle}
                     />
                     <Button key={`approve_${isWarning}`} size="tall" variant={isWarning ? "secondary" : "primary"}
-                            onClick={() => {
-                                handleOnResponse(true);
-                            }}
-                            disabled={approveDisabled}
-                            loading={submitting || approveLoading}
-                            text={approveTitle}
+                        onClick={() => {
+                            handleOnResponse(true);
+                        }}
+                        disabled={approveDisabled}
+                        loading={submitting || approveLoading}
+                        text={approveTitle}
                     />
                 </div>
             </div>

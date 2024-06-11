@@ -1,5 +1,5 @@
 import clsx from "classnames";
-import { forwardRef, type ReactNode, type Ref } from "react";
+import { FC, forwardRef, type ReactNode, type Ref } from "react";
 import { ButtonOrLink, type ButtonOrLinkProps } from "./utils/ButtonOrLink";
 import LoadingIndicator from "_components/loading/LoadingIndicator";
 
@@ -32,7 +32,7 @@ interface LargeButtonProps extends ButtonOrLinkProps {
   disabled?: boolean;
 }
 
-export const LargeButton = forwardRef(
+export const LargeButton: FC<LargeButtonProps> = forwardRef(
   (
     {
       top,

@@ -11,7 +11,7 @@ type AppState = {
 	appType: AppType;
 	apiEnv: API_ENV;
 	navVisible: boolean;
-	customRPC?: string | null;
+	fullNode?: string | null;
 	activeOrigin: string | null;
 	activeOriginFavIcon: string | null;
 	pendingTransactionBlock: string | null;
@@ -20,7 +20,7 @@ type AppState = {
 const initialState: AppState = {
 	appType: AppType.unknown,
 	apiEnv: DEFAULT_API_ENV,
-	customRPC: null,
+	fullNode: null,
 	navVisible: true,
 	activeOrigin: null,
 	activeOriginFavIcon: null,
@@ -33,27 +33,27 @@ export const changeActiveNetwork = createAsyncThunk<
 	AppThunkConfig
 >(
 	"changeRPCNetwork",
-	async ( { network, store = false }, { extra: { background, api }, dispatch }, ) => {
-		if ( store ) {
-			await background.setActiveNetworkEnv( network );
+	async ({ network, store = false }, { extra: { background, api }, dispatch },) => {
+		if (store) {
+			await background.setActiveNetworkEnv(network);
 		}
-		api.setNewJsonRpcProvider( network.env, network.customRpcUrl );
-		await dispatch( slice.actions.setActiveNetwork( network ) );
+		api.setNewJsonRpcProvider(network.env, network.fullNode);
+		await dispatch(slice.actions.setActiveNetwork(network));
 	},
 );
 
-const slice = createSlice( {
+const slice = createSlice({
 	name: "app",
 	reducers: {
-		initAppType: ( state, { payload }: PayloadAction<AppType> ) => {
+		initAppType: (state, { payload }: PayloadAction<AppType>) => {
 			state.appType = payload;
 		},
 		setActiveNetwork: (
 			state,
-			{ payload: { env, customRpcUrl } }: PayloadAction<NetworkEnvType>,
+			{ payload: { env, fullNode } }: PayloadAction<NetworkEnvType>,
 		) => {
 			state.apiEnv = env;
-			state.customRPC = customRpcUrl;
+			state.fullNode = fullNode;
 		},
 		setNavVisibility: (
 			state,
@@ -78,9 +78,10 @@ const slice = createSlice( {
 		},
 	},
 	initialState,
-} );
+});
 
 export const { initAppType, setNavVisibility, setActiveOrigin, setPendingTransactionBlock } = slice.actions;
-export const getNavIsVisible = ( { app }: RootState ) => app.navVisible;
+export const getNavIsVisible = ({ app }: RootState) => app.navVisible;
+export const getApiEnv = ({ app }: RootState) => app.apiEnv;
 
 export default slice.reducer;

@@ -30,15 +30,13 @@ import { AccountSelector } from "_src/ui/app/components/AccountSelector";
 import { usePinnedCoinTypes } from "_src/ui/app/hooks/usePinnedCoinTypes";
 import { useRecognizedPackages } from "_src/ui/app/hooks/useRecognizedPackages";
 import PageTitle from "_src/ui/app/shared/PageTitle";
-import FaucetRequestButton from "_src/ui/app/shared/faucet/FaucetRequestButton";
 import {
+	CoinAPI,
 	XDAG_TYPE_ARG,
-	Coin,
 } from "_src/xdag/typescript/framework";
 import type { CoinBalance as CoinBalanceType } from "_src/xdag/typescript/types";
 import BigNumber from "bignumber.js";
 import { useTranslation } from 'react-i18next';
-import { LanguageSelector } from "_components/language-selector";
 
 
 type TokenDetailsProps = {
@@ -163,7 +161,6 @@ function MyTokens() {
 
 			{ noXdagToken ? (
 				<div className="flex flex-col flex-nowrap justify-center items-center gap-2 text-center mt-6 px-2.5">
-					<FaucetRequestButton/>
 					<Text variant="pBodySmall" color="gray-80" weight="normal">
 						To conduct transactions on the XDAG network, you need XDAG in your wallet.
 					</Text>
@@ -202,7 +199,7 @@ function TokenDetails( { coinType }: TokenDetailsProps ) {
 	const tokenBalance = BigNumber( coinBalance?.totalBalance ?? "0" );//|| BigInt(0))
 
 	const coinSymbol = useMemo(
-		() => Coin.getCoinSymbol( activeCoinType ),
+		() => CoinAPI.getCoinSymbol( activeCoinType ),
 		[ activeCoinType ],
 	);
 	// Avoid perpetual loading state when fetching and retry keeps failing add isFetched check
@@ -273,7 +270,7 @@ function TokenDetails( { coinType }: TokenDetailsProps ) {
 							{ t( "TokenDetails.Send" ) }
 						</LargeButton>
 
-						<LargeButton center to="/" disabled={ false } top={ <Swap16/> }>
+						<LargeButton center to="/" disabled={ true } top={ <Swap16/> }>
 							{ t( "TokenDetails.Swap" ) }
 						</LargeButton>
 					</div>

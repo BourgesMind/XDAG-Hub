@@ -112,7 +112,7 @@
     "ThePasswordUseLockUnlockWallet": "C'est le mot de passe que vous utilisez actuellement pour verrouiller et déverrouiller votre portefeuille XDAG."
   },
   "ExportAccount": {
-    "YourPrivateKey":"Votre clé privée",
+    "YourPrivateKey": "Votre clé privée",
     "DoNotShare": "Ne partagez pas votre clé privée !",
     "ItProvidesFullControl": "Elle donne un contrôle total sur votre compte.",
     "PrivateKeyCopied": "Clé privée copiée",
@@ -152,9 +152,17 @@
     "MightFailWarning": "Cette transaction transférera vos jetons et pourrait échouer. Êtes-vous sûr de vouloir toujours approuver la transaction ?",
     "ChargedGasFeeWarning": "Vous serez toujours facturé des frais de gaz pour cette transaction selon le protocole XDag."
   },
+  "InscriptionRequest": {
+    "PageTitle": "Gravure",
+    "Approve": "Approuver",
+    "Reject": "Rejeter",
+    "ApproveTransaction": "Approuver la transaction",
+    "MightFailWarning": "Cette transaction contient des transactions en lot, l'approbation signifie que toutes les transactions seront exécutées.",
+    "ChargedGasFeeWarning": "Le transfert de XDAG et les frais de gaz sont déjà inclus dans cette transaction."
+  },
   "DAppInfoCard": {
     "ViewWebsite": "Voir le site web",
-    "ConnectedAccount": "Compte connecté"
+    "ConnectedAccount": "À"
   },
   "GasFees": {
     "EstimatedGasFees": "Frais de gaz estimés",
@@ -231,12 +239,15 @@
     "TransactionStatus": "Statut de la transaction"
   },
   "TransactionStatus": {
+    "Pushing": "En cours de poussée",
     "Pending": "En attente",
     "Accepted": "Accepté",
     "Rejected": "Rejeté",
     "BlinkingUntilBlockchainAccepted": "Clignotant jusqu'à ce qu'il soit accepté par la blockchain",
     "WillTakeAbout5Minutes": "Cela prendra environ 5 minutes...",
-    "CanLeaveOrViewOnExplorerOrWaitHere": "Vous pouvez partir, voir sur l'explorateur ou attendre ici"
+    "CanLeaveOrViewOnExplorerOrWaitHere": "Vous pouvez partir, voir sur l'explorateur ou attendre ici",
+    "BatchTxProcessingDontLeave": "ne fermez pas la fenêtre, veuillez patienter !",
+    "PushBatchTo": "Envoyer le lot de transactions à"
   },
   "ExplorerLinkCard": {
     "ViewOnExplorer": "Voir sur l'explorateur"
@@ -284,5 +295,13 @@
     "ShouldBeGreaterThan0": "Doit être supérieur à 0 {{_Symbol}}",
     "MustBeLessThan": " doit être inférieur à {{_BalanceText}}",
     "ExceedsMaximumDecimals": "La valeur dépasse le nombre maximal de décimales autorisées {{_Decimals}}"
+  },
+  "InscriptionDetails": {
+    "Header": "Inscription textuelle",
+    "Chunks": "Nombre de fragments",
+    "Gas": "Frais de gaz",
+    "Award": "Coût de la récompense",
+    "TotalCost": "Coût total",
+    "insufficientBalance": "Solde insuffisant pour couvrir le coût total de la transaction"
   }
 }

@@ -21,100 +21,98 @@ export type TransactionRequestProps = {
 	txRequest: TransactionApprovalRequest;
 };
 
-export function TransactionRequest( { txRequest }: TransactionRequestProps ) {
+export function TransactionRequest({ txRequest }: TransactionRequestProps) {
 
 	const addressForTransaction = txRequest.tx.account;
-	const signer = useSigner( addressForTransaction );
+	const signer = useSigner();
 	const dispatch = useAppDispatch();
 	const { t } = useTranslation();
 	const navigate = useNavigate();
-	const transaction = useMemo( () => {
+	const transaction = useMemo(() => {
 		// const tx = TransactionBlock.from(txRequest.tx);
-		const txBlock = createXDagTransferTransactionBlock( txRequest.tx.toAddress!, txRequest.tx.amount, txRequest.tx.remark );
-		if ( addressForTransaction ) {
-			txBlock.setSenderIfNotSet( addressForTransaction );
+		const txBlock = createXDagTransferTransactionBlock(txRequest.tx.toAddress!, txRequest.tx.amount, txRequest.tx.remark);
+		if (addressForTransaction) {
+			txBlock.setSenderIfNotSet(addressForTransaction);
 		}
 		return txBlock;
-	}, [ txRequest.tx, addressForTransaction ] );
+	}, [txRequest.tx, addressForTransaction]);
 
-	const { isLoading, isError } = useTransactionData( addressForTransaction, transaction, );
-	const [ isConfirmationVisible, setConfirmationVisible ] = useState( false );
-	const summary = useTransactionSummary( { transaction: undefined, currentAddress: addressForTransaction, } );
+	const { isLoading, isError } = useTransactionData(addressForTransaction, transaction,);
+	const [isConfirmationVisible, setConfirmationVisible] = useState(false);
+	const summary = useTransactionSummary({ transaction: undefined, currentAddress: addressForTransaction, });
 
-	if ( !signer ) {
+	if (!signer) {
 		return null;
 	}
 
 	return (
 		<>
 			<UserApproveContainer
-				origin={ txRequest.origin }
-				originFavIcon={ txRequest.originFavIcon }
-				approveTitle={ t( "TransactionRequest.Approve" ) }
-				rejectTitle={ t( "TransactionRequest.Reject" ) }
-				onSubmit={ async ( approved: boolean ) => {
-					if ( isLoading ) {
+				origin={txRequest.origin}
+				originFavIcon={txRequest.originFavIcon}
+				approveTitle={t("TransactionRequest.Approve")}
+				rejectTitle={t("TransactionRequest.Reject")}
+				onSubmit={async (approved: boolean) => {
+					if (isLoading) {
 						return;
 					}
-					if ( approved ) {
-						setConfirmationVisible( true );
+					if (approved) {
+						setConfirmationVisible(true);
 						return;
-					}else {
+					} else {
 						window.close();
 					}
-					await dispatch(
-						respondToTransactionRequest( {approved, txRequestID: txRequest.id, signer, /* clientIdentifier,*/	} ),
-					);
-				} }
-				address={ addressForTransaction }
-				approveLoading={ isLoading || isConfirmationVisible }
+					await dispatch( respondToTransactionRequest({ approved, txRequestID: txRequest.id, signer }), );
+				}}
+				address={addressForTransaction}
+				approveLoading={isLoading || isConfirmationVisible}
 			>
-				<PageMainLayoutTitle title={ t( "TransactionRequest.ApproveTransaction" ) }/>
+				<PageMainLayoutTitle title={t("TransactionRequest.ApproveTransaction")} />
 
 				<div className="flex flex-col gap-4">
 					<TransactionSummary
 						isDryRun
 						// isLoading={isDryRunLoading}
 						// isError={isDryRunError}
-						isLoading={ true }
-						isError={ true }
-						showGasSummary={ false }
-						summary={ summary }
+						isLoading={true}
+						isError={true}
+						showGasSummary={false}
+						summary={summary}
 					/>
 				</div>
 				<section className="flex flex-col gap-4">
-					<GasFees sender={ addressForTransaction } transaction={ transaction }/>
+					<GasFees sender={addressForTransaction} transaction={transaction} />
 					<TransactionDetails
-						sender={ addressForTransaction }
-						transaction={ transaction }
+						sender={addressForTransaction}
+						transaction={transaction}
 					/>
 				</section>
 			</UserApproveContainer>
 			<ConfirmationModal
-				isOpen={ isConfirmationVisible }
-				title={ t( "TransactionRequest.MightFailWarning" ) }
-				hint={ t( "TransactionRequest.ChargedGasFeeWarning" ) }
+				isOpen={isConfirmationVisible}
+				title={t("TransactionRequest.MightFailWarning")}
+				hint={t("TransactionRequest.ChargedGasFeeWarning")}
 				confirmStyle="primary"
-				confirmText={ t( "TransactionRequest.Approve" ) }
-				cancelText={ t( "TransactionRequest.Reject" ) }
+				confirmText={t("TransactionRequest.Approve")}
+				cancelText={t("TransactionRequest.Reject")}
 				cancelStyle="warning"
-				onResponse={ async ( isConfirmed ) => {
-					if( !isConfirmed ){
+				onResponse={async (isConfirmed) => {
+					if (!isConfirmed) {
 						window.close();
 					}
-					const result = await dispatch( respondToTransactionRequest( {
-							approved: isConfirmed, txRequestID: txRequest.id, signer,
-							// clientIdentifier,
-						} ),
+					const result = await dispatch(respondToTransactionRequest({
+						approved: isConfirmed, txRequestID: txRequest.id, signer,
+						// clientIdentifier,
+					}),
 					);
 					const txAddress = (result as any)?.payload?.txResponse?.address;
-					const receiptUrl = `/receipt?blockAddress=${ encodeURIComponent( txAddress ) }&from=transactions`;
-					setConfirmationVisible( false );
-					return navigate( receiptUrl );
+					const receiptUrl = `/receipt?blockAddress=${encodeURIComponent(txAddress)}&from=transactions`;
+					setConfirmationVisible(false);
+					return navigate(receiptUrl);
 				}
 				}
 			/>
-			{/*{notificationModal}*/ }
+			{/*{notificationModal}*/}
 		</>
 	);
 }

@@ -15,22 +15,22 @@ export type PageLayoutProps = {
 	className?: string;
 };
 
-function PageLayout( {
-											 forceFullscreen = false,
-											 children,
-											 className,
-										 }: PageLayoutProps ) {
-	const networkName = useAppSelector( ( { app: { apiEnv } } ) => apiEnv );
-	const guardLoading = useFullscreenGuard( forceFullscreen );
-	const isNavVisible = useAppSelector( getNavIsVisible );
+function PageLayout({
+	forceFullscreen = false,
+	children,
+	className,
+}: PageLayoutProps) {
+	const networkName = useAppSelector(({ app: { apiEnv } }) => apiEnv);
+	const guardLoading = useFullscreenGuard(forceFullscreen);
+	const isNavVisible = useAppSelector(getNavIsVisible);
 	return (
-		<Loading loading={ guardLoading }>
+		<Loading loading={guardLoading}>
 			<div
-				className={ cl( "w-popup-width h-popup-height", st.container, className, {
-					[ st.navHidden ]: !isNavVisible,
-				} ) }
+				className={cl("w-popup-width h-popup-height", st.container, className, {
+					[st.navHidden]: !isNavVisible,
+				})}
 			>
-				{ children }
+				{children}
 				<div id="overlay-portal-container"></div>
 				<div id="toaster-portal-container"></div>
 			</div>
@@ -38,4 +38,4 @@ function PageLayout( {
 	);
 }
 
-export default memo( PageLayout );
+export default memo(PageLayout);

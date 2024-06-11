@@ -28,6 +28,8 @@ import SiteConnectPage from "_pages/site-connect";
 import WelcomePage from "_pages/welcome";
 import { setNavVisibility } from "_redux/slices/app";
 import './i18n/config'
+import { ApprovalInscriptionRequestPage } from "./pages/approval-inscription-request";
+import InscriptionReceiptPage from "./pages/approval-inscription-request/inscription-request/InscriptionReceipt";
 
 const HIDDEN_MENU_PATHS = [
   "/nft-details",
@@ -50,7 +52,7 @@ const App = () => {
 
   const location = useLocation();
   useEffect(() => {
-    const menuVisible = !HIDDEN_MENU_PATHS.some((aPath) => location.pathname.startsWith(aPath), );
+    const menuVisible = !HIDDEN_MENU_PATHS.some((aPath) => location.pathname.startsWith(aPath),);
     dispatch(setNavVisibility(menuVisible));
   }, [location, dispatch]);
 
@@ -62,10 +64,11 @@ const App = () => {
         <Route path="tokens/*" element={<TokensPage />} />
         <Route path="nfts/*" element={<AssetsPage />} />
         <Route path="apps/*" element={<AppsPage />} />
-        <Route path="transactions/:status?" element={<TransactionBlocksPage />}/>
+        <Route path="transactions/:status?" element={<TransactionBlocksPage />} />
         <Route path="send" element={<TransferCoinPage />} />
         <Route path="send/select" element={<CoinsSelectorPage />} />
         <Route path="receipt" element={<ReceiptPage />} />
+        <Route path="receipt-inscription" element={<InscriptionReceiptPage />} />
         <Route path="onramp" element={<OnrampPage />} />
         <Route path="*" element={<Navigate to="/tokens" replace={true} />} />
       </Route>
@@ -73,6 +76,7 @@ const App = () => {
       <Route path="/dapp/*" element={<HomePage disableNavigation />}>
         <Route path="connect/:requestID" element={<SiteConnectPage />} />
         <Route path="approve/:requestID" element={<ApprovalRequestPage />} />
+        <Route path="approveInscription/:requestID" element={<ApprovalInscriptionRequestPage />} />
       </Route>
 
       <Route path="welcome" element={<WelcomePage />} />
@@ -81,7 +85,7 @@ const App = () => {
         <Route path="create" element={<CreatePage />} />
         <Route path="import" element={<ImportPage />} />
         <Route path="backup" element={<BackupPage />} />
-        <Route path="backup-imported" element={<BackupPage mode="imported" />}/>
+        <Route path="backup-imported" element={<BackupPage mode="imported" />} />
       </Route>
       <Route path="locked" element={<LockedPage />} />
       <Route path="forgot-password" element={<ForgotPasswordPage />} />

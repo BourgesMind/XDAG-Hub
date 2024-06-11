@@ -152,9 +152,17 @@
     "MightFailWarning": "This transaction will transfer your coins and might fail. Are you sure you still want to approve the transaction?",
     "ChargedGasFeeWarning": "You will still be charged a gas fee for this transaction according to XDag protocol."
   },
+  "InscriptionRequest": {
+    "PageTitle": "Inscription",
+    "Approve": "Approve",
+    "Reject": "Reject",
+    "ApproveTransaction": "Approve Transaction",
+    "MightFailWarning": "This transaction contains batch transactions, approval means all transactions will execute.",
+    "ChargedGasFeeWarning": "XDAG gas fees are already included in this transaction."
+  },
   "DAppInfoCard": {
     "ViewWebsite": "View Website",
-    "ConnectedAccount": "Connected account"
+    "ConnectedAccount": "To"
   },
   "GasFees": {
     "EstimatedGasFees": "Estimated Gas Fees",
@@ -232,12 +240,15 @@
     "TransactionStatus": "Transaction Status"
   },
   "TransactionStatus": {
+    "Pushing": "Pushing",
     "Pending": "Pending",
     "Accepted": "Accepted",
     "Rejected": "Rejected",
     "BlinkingUntilBlockchainAccepted": "Blinking until Accepted by blockchain ",
     "WillTakeAbout5Minutes": "Will take about 5 minutes...",
-    "CanLeaveOrViewOnExplorerOrWaitHere": "Can Leave or View on explorer or Wait here"
+    "CanLeaveOrViewOnExplorerOrWaitHere": "Can Leave or View on explorer or Wait here",
+    "BatchTxProcessingDontLeave": "DON'T CLOSE this window, please wait!",
+    "PushBatchTo": "Push batch transactions to"
   },
   "ExplorerLinkCard": {
     "ViewOnExplorer": "View on Explorer"
@@ -286,5 +297,13 @@
     "ShouldBeGreaterThan0": "Must be greater than 0 {{_Symbol}}",
     "MustBeLessThan": " must be less than {{_BalanceText}}",
     "ExceedsMaximumDecimals": "The value exceeds the maximum decimals {{_Decimals}}"
+  },
+  "InscriptionDetails": {
+    "Header": "Text inscription",
+    "Chunks": "Chunks",
+    "Gas": "Gas fee",
+    "Award": "Award cost",
+    "TotalCost": "Total cost",
+    "insufficientBalance": "Insufficient balance to cover the total transaction cost"
   }
 }

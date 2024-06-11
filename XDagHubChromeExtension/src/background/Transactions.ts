@@ -17,12 +17,11 @@ import type { ContentScriptConnection } from "_src/background/connections/Conten
 const STALE_TRANSACTION_MILLISECONDS = 1000 * 60 * 60 * 3; // 3 hours
 const TX_STORE_KEY = "transactions";
 
-function openTxWindow( requestID: string ) {
-	return new Window( Browser.runtime.getURL( "ui.html" ) + `#/dapp/approve/${ encodeURIComponent( requestID ) }`, );
+function openTxWindow(requestID: string) {
+	return new Window(Browser.runtime.getURL("ui.html") + `#/dapp/approve/${encodeURIComponent(requestID)}`,);
 }
 
-class Transactions
-{
+class Transactions {
 	private _txResponseMessages = new Subject<TransactionRequestResponse>();
 
 	public async executeOrSignTransaction(
@@ -34,16 +33,16 @@ class Transactions
 			connection.origin,
 			connection.originFavIcon,
 		);
-		if ( txResultError ) {
-			throw new Error( `Transaction failed with the following error. ${ txResultError }`, );
+		if (txResultError) {
+			throw new Error(`Transaction failed with the following error. ${txResultError}`,);
 		}
-		if ( sign && !txSigned ) {
-			throw new Error( "Transaction signature is empty" );
+		if (sign && !txSigned) {
+			throw new Error("Transaction signature is empty");
 		}
-		if ( tx ) {
+		if (tx) {
 			//transaction
-			if ( !txResult  ) {
-				throw new Error( `Transaction result is empty ${ txResult }` );
+			if (!txResult) {
+				throw new Error(`Transaction result is empty ${txResult}`);
 			}
 			return txResult as XDagTransactionBlockResponse;
 		} else {
@@ -65,53 +64,50 @@ class Transactions
 			connection.origin,
 			connection.originFavIcon,
 		);
-		if ( txResultError ) {
-			throw new Error( `Signing message failed with the following error ${ txResultError }`, );
+		if (txResultError) {
+			throw new Error(`Signing message failed with the following error ${txResultError}`,);
 		}
-		if ( !txResult ) {
-			throw new Error( "Sign message result is empty" );
+		if (!txResult) {
+			throw new Error("Sign message result is empty");
 		}
-		if ( !("messageBytes" in txResult) ) {
-			throw new Error( "Sign message error, unknown result" );
+		if (!("messageBytes" in txResult)) {
+			throw new Error("Sign message error, unknown result");
 		}
 		return txResult;
 	}
 
-	public async getTransactionRequests(): Promise<
-		Record<string, ApprovalRequest>
-	> {
-		return (await Browser.storage.local.get( { [ TX_STORE_KEY ]: {} } ))[
-			TX_STORE_KEY
-			];
+	public async getTransactionRequests(): Promise<Record<string, ApprovalRequest>> {
+		console.log("%%%%%%%准备取存储的内容：",TX_STORE_KEY);
+		return (await Browser.storage.local.get({ [TX_STORE_KEY]: {} }))[TX_STORE_KEY];
 	}
 
 	public async getTransactionRequest(
 		txRequestID: string,
 	): Promise<ApprovalRequest | null> {
-		return (await this.getTransactionRequests())[ txRequestID ] || null;
+		return (await this.getTransactionRequests())[txRequestID] || null;
 	}
 
-	public handleMessage( msg: TransactionRequestResponse ) {
-		this._txResponseMessages.next( msg );
+	public handleMessage(msg: TransactionRequestResponse) {
+		this._txResponseMessages.next(msg);
 	}
 
 	public async clearStaleTransactions() {
 		const now = Date.now();
 		const allTransactions = await this.getTransactionRequests();
 		let hasChanges = false;
-		Object.keys( allTransactions ).forEach( ( aTransactionID ) => {
-			const aTransaction = allTransactions[ aTransactionID ];
-			const createdDate = new Date( aTransaction.createdDate );
+		Object.keys(allTransactions).forEach((aTransactionID) => {
+			const aTransaction = allTransactions[aTransactionID];
+			const createdDate = new Date(aTransaction.createdDate);
 			if (
 				aTransaction.approved !== null ||
 				now - createdDate.getTime() >= STALE_TRANSACTION_MILLISECONDS
 			) {
-				delete allTransactions[ aTransactionID ];
+				delete allTransactions[aTransactionID];
 				hasChanges = true;
 			}
-		} );
-		if ( hasChanges ) {
-			await this.saveTransactionRequests( allTransactions );
+		});
+		if (hasChanges) {
+			await this.saveTransactionRequests(allTransactions);
 		}
 	}
 
@@ -130,20 +126,20 @@ class Transactions
 		};
 	}
 
-	private async saveTransactionRequests( txRequests: Record<string, ApprovalRequest>, ) {
-		await Browser.storage.local.set( { [ TX_STORE_KEY ]: txRequests } );
+	private async saveTransactionRequests(txRequests: Record<string, ApprovalRequest>,) {
+		await Browser.storage.local.set({ [TX_STORE_KEY]: txRequests });
 	}
 
-	private async storeTransactionRequest( txRequest: ApprovalRequest ) {
+	private async storeTransactionRequest(txRequest: ApprovalRequest) {
 		const txs = await this.getTransactionRequests();
-		txs[ txRequest.id ] = txRequest;
-		await this.saveTransactionRequests( txs );
+		txs[txRequest.id] = txRequest;
+		await this.saveTransactionRequests(txs);
 	}
 
-	private async removeTransactionRequest( txID: string ) {
+	private async removeTransactionRequest(txID: string) {
 		const txs = await this.getTransactionRequests();
-		delete txs[ txID ];
-		await this.saveTransactionRequests( txs );
+		delete txs[txID];
+		await this.saveTransactionRequests(txs);
 	}
 
 	private async requestApproval(
@@ -151,25 +147,25 @@ class Transactions
 		origin: string,
 		favIcon?: string,
 	) {
-		const txRequest = this.createTransactionRequest( request, origin, favIcon );
-		await this.storeTransactionRequest( txRequest );
-		const popUp = openTxWindow( txRequest.id );
+		const txRequest = this.createTransactionRequest(request, origin, favIcon);
+		await this.storeTransactionRequest(txRequest);
+		const popUp = openTxWindow(txRequest.id);
 		const popUpClose = (await popUp.show()).pipe(
-			take( 1 ),
-			map<number, false>( () => false ),
+			take(1),
+			map<number, false>(() => false),
 		);
 		const txResponseMessage = this._txResponseMessages.pipe(
-			filter( ( msg ) => msg.txID === txRequest.id ),
-			take( 1 ),
+			filter((msg) => msg.txID === txRequest.id),
+			take(1),
 		);
 		return lastValueFrom(
-			race( popUpClose, txResponseMessage ).pipe(
-				take( 1 ),
-				map( async ( response ) => {
-					await this.removeTransactionRequest( txRequest.id );
-					if ( response ) {
+			race(popUpClose, txResponseMessage).pipe(
+				take(1),
+				map(async (response) => {
+					await this.removeTransactionRequest(txRequest.id);
+					if (response) {
 						const { approved, txResult, txSigned, txResultError } = response;
-						if ( approved ) {
+						if (approved) {
 							txRequest.approved = approved;
 							txRequest.txResult = txResult;
 							txRequest.txResultError = txResultError;
@@ -177,8 +173,8 @@ class Transactions
 							return txRequest;
 						}
 					}
-					throw new Error( "Rejected from user" );
-				} ),
+					throw new Error("Rejected from user");
+				}),
 			),
 		);
 	}

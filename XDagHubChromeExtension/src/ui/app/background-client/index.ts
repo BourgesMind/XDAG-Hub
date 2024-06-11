@@ -12,7 +12,6 @@ import { setActiveOrigin, changeActiveNetwork } from "_redux/slices/app";
 import { setPermissions } from "_redux/slices/permissions";
 import { setTransactionRequests } from "_redux/slices/transaction-requests";
 import { toB64 } from "_src/xdag/bcs";
-
 import type { Message } from "_messages";
 import type { KeyringPayload } from "_payloads/keyring";
 import type {
@@ -37,6 +36,11 @@ import type {
 } from "_src/xdag/typescript/signers";
 
 import type { AppDispatch } from "_store";
+import { GetInscriptionRequests } from "_src/shared/messaging/messages/payloads/inscription/ui/GetInscriptionRequests";
+import { isGetInscriptionRequestsResponse } from "_src/shared/messaging/messages/payloads/inscription/ui/GetInscriptionRequestsResponse";
+import { setInscriptionRequests } from "../redux/slices/inscription-requests";
+import { InscriptionRequestResponse } from "_src/shared/messaging/messages/payloads/inscription/ui/InscriptionRequestResponse";
+import { setCurChunkResult, setCurInscIsProcessing, setCurInscRequest, setCurInscResponse } from "../redux/slices/curInscriptionRequestSlice";
 
 /**
  * The duration in milliseconds that the UI sends status updates (active/inactive) to the background service.
@@ -61,6 +65,7 @@ export class BackgroundClient {
     return Promise.all([
       this.sendGetPermissionRequests(),
       this.sendGetTransactionRequests(),
+      this.sendGetInscriptionRequests(),
       this.getWalletStatus(),
       this.getNetwork(),
     ]).then(
@@ -68,7 +73,7 @@ export class BackgroundClient {
     );
   }
 
-  public sendPermissionResponse( id: string, accounts: XDagAddress[], allowed: boolean, responseDate: string, ) {
+  public sendPermissionResponse(id: string, accounts: XDagAddress[], allowed: boolean, responseDate: string,) {
     this.sendMessage(
       createMessage<PermissionResponse>({
         id,
@@ -109,11 +114,38 @@ export class BackgroundClient {
     );
   }
 
+  public sendInscriptionRequestResponse(
+    inscID: string,
+    approved: boolean,
+    inscResult?: string[],
+    inscResultError?: string,
+  ) {
+    this.sendMessage(
+      createMessage<InscriptionRequestResponse>({
+        type: "inscription-request-response",
+        approved,
+        inscID,
+        inscResult,
+        inscResultError,
+      }),
+    );
+  }
+
   public sendGetTransactionRequests() {
     return lastValueFrom(
       this.sendMessage(
         createMessage<GetTransactionRequests>({
           type: "get-transaction-requests",
+        }),
+      ).pipe(take(1)),
+    );
+  }
+
+  public sendGetInscriptionRequests() {
+    return lastValueFrom(
+      this.sendMessage(
+        createMessage<GetInscriptionRequests>({
+          type: "get-inscription-requests",
         }),
       ).pipe(take(1)),
     );
@@ -212,7 +244,7 @@ export class BackgroundClient {
     );
   }
 
-  public signData( address: XDagAddress, data: Uint8Array ): Promise<SerializedSignature> {
+  public signData(address: XDagAddress, data: Uint8Array): Promise<SerializedSignature> {
     return lastValueFrom(
       this.sendMessage(
         createMessage<KeyringPayload<"signData">>({
@@ -226,14 +258,14 @@ export class BackgroundClient {
           if (isKeyringPayload(payload, "signData") && payload.return) {
             return payload.return;
           }
-          throw new Error("Error unknown response for signData message:\n"+ (payload as any).type+ "\n" + (payload as any).errorInfo);
+          throw new Error("Error unknown response for signData message:\n" + (payload as any).type + "\n" + (payload as any).errorInfo);
         }),
       ),
     );
   }
 
 
-  public signDataByType( address: XDagAddress, data: Uint8Array, signType:string ): Promise<SerializedSignature> {
+  public signDataByType(address: XDagAddress, data: Uint8Array, signType: string): Promise<SerializedSignature> {
     return lastValueFrom(
       this.sendMessage(
         createMessage<KeyringPayload<"signDataByType">>({
@@ -247,10 +279,10 @@ export class BackgroundClient {
           if (isKeyringPayload(payload, "signDataByType") && payload.return) {
             return payload.return;
           }
-          throw new Error("Error unknown response for signDataByType message:\ntype:" + (payload as any).type+
-            "\nmethod:"+ (payload as any)?.method+
-            "\nreturn:"+ (payload as any)?.return+
-            "\ninput signType:"+ (payload as any)?.signType);
+          throw new Error("Error unknown response for signDataByType message:\ntype:" + (payload as any).type +
+            "\nmethod:" + (payload as any)?.method +
+            "\nreturn:" + (payload as any)?.return +
+            "\ninput signType:" + (payload as any)?.signType);
         }),
       ),
     );
@@ -403,16 +435,24 @@ export class BackgroundClient {
     let action;
     if (isPermissionRequests(payload)) {
       action = setPermissions(payload.permissions);
-    } else if (isGetTransactionRequestsResponse(payload)) {
+    }
+    else if (isGetTransactionRequestsResponse(payload)) {
       action = setTransactionRequests(payload.txRequests);
-    } else if (isUpdateActiveOrigin(payload)) {
+    }
+    else if (isGetInscriptionRequestsResponse(payload)) {
+      this._dispatch(setCurChunkResult(undefined));
+      this._dispatch(setCurInscIsProcessing(false));
+      this._dispatch(setCurInscRequest(undefined));
+      this._dispatch(setCurInscResponse(undefined));
+      action = setInscriptionRequests(payload.inscRequests);
+    }
+    else if (isUpdateActiveOrigin(payload)) {
       action = setActiveOrigin(payload);
-    } else if (
-      isKeyringPayload<"walletStatusUpdate">(payload, "walletStatusUpdate") &&
-      payload.return
-    ) {
+    }
+    else if (isKeyringPayload<"walletStatusUpdate">(payload, "walletStatusUpdate") && payload.return) {
       action = setKeyringStatus(payload.return);
-    }  else if (isSetNetworkPayload(payload)) {
+    }
+    else if (isSetNetworkPayload(payload)) {
       action = changeActiveNetwork({
         network: payload.network,
       });
@@ -423,7 +463,7 @@ export class BackgroundClient {
   }
 
   private createPortStream() {
-    this._portStream = PortStream.connectToBackgroundService( "xdag_ui<->background");
+    this._portStream = PortStream.connectToBackgroundService("xdag_ui<->background");
     this._portStream.onDisconnect.subscribe(() => {
       this.createPortStream();
     });
@@ -436,7 +476,7 @@ export class BackgroundClient {
     if (this._portStream?.connected) {
       return this._portStream.sendMessage(msg);
     } else {
-      throw new Error( "Failed to send message to background service. Port not connected.", );
+      throw new Error("Failed to send message to background service. Port not connected.",);
     }
   }
 }

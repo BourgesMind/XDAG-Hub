@@ -23,6 +23,8 @@ import type { UpdateActiveOrigin } from "_payloads/tabs/updateActiveOrigin";
 import type { ApprovalRequest } from "_payloads/transactions/ApprovalRequest";
 import type { GetTransactionRequestsResponse } from "_payloads/transactions/ui/GetTransactionRequestsResponse";
 import type { Runtime } from "webextension-polyfill";
+import { GetInscriptionRequestsResponse, InscriptionApprovalRequest, isGetInscriptionRequests } from "_src/shared/messaging/messages/payloads/inscription";
+import { inscriptionExcutor } from "../InscriptionExecutor";
 
 export class UiConnection extends Connection {
   public static readonly CHANNEL: PortChannelName = "xdag_ui<->background";
@@ -94,15 +96,20 @@ export class UiConnection extends Connection {
           Object.values(await Transactions.getTransactionRequests()),
           id,
         );
-
-      } else if (isDisconnectApp(payload)) {
+      } else if (isGetInscriptionRequests(payload)) {
+        this.sendInscriptionRequests(
+          Object.values(await inscriptionExcutor.getInscriptionRequests()),
+          id,
+        );
+      } 
+      else if (isDisconnectApp(payload)) {
         await Permissions.delete(payload.origin, payload.specificAccounts);
         this.send(createMessage({ type: "done" }, id));
 
       } else if (isBasePayload(payload) && payload.type === "keyring") {
         await Keyring.handleUiMessage(msg, this);
 
-      }  else if (isBasePayload(payload) && payload.type === "get-network") {
+      } else if (isBasePayload(payload) && payload.type === "get-network") {
         this.send(
           createMessage<SetNetworkPayload>(
             {
@@ -142,15 +149,24 @@ export class UiConnection extends Connection {
     );
   }
 
-  private sendTransactionRequests(
-    txRequests: ApprovalRequest[],
-    requestID: string,
-  ) {
+  private sendTransactionRequests(txRequests: ApprovalRequest[], requestID: string,) {
     this.send(
       createMessage<GetTransactionRequestsResponse>(
         {
           type: "get-transaction-requests-response",
           txRequests,
+        },
+        requestID,
+      ),
+    );
+  }
+
+  private sendInscriptionRequests(inscRequests: InscriptionApprovalRequest[], requestID: string,) {
+    this.send(
+      createMessage<GetInscriptionRequestsResponse>(
+        {
+          type: "get-inscription-requests-response",
+          inscRequests,
         },
         requestID,
       ),

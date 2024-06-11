@@ -13,7 +13,7 @@ type LogoProps = {
 
 const networkLogos = {
   [API_ENV.mainnet]: XdagMainnet,
-  [API_ENV.devNet]: XdagDevnet,
+  // [API_ENV.devNet]: XdagDevnet,
   [API_ENV.testNet]: XdagTestnet,
   [API_ENV.local]: XdagLocal,
   [API_ENV.customRPC]: XdagCustomRpc,

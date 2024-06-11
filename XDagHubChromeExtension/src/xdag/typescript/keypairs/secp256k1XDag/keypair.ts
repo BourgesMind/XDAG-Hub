@@ -137,9 +137,11 @@ export class Secp256k1Keypair extends Keypair
 
 		//from
 		let from = checkBase58Address( fromAddr );
+		// console.log("check from address: ok");
 
 		//to
 		let to = checkBase58Address( toAddr );
+		// console.log("check to address: ok");
 
 		//remark
 		const remarkBytes: Uint8Array = new Uint8Array( 32 );
@@ -147,6 +149,7 @@ export class Secp256k1Keypair extends Keypair
 			const encoder = new TextEncoder();
 			let remarkBytesList = encoder.encode( remark );
 			if ( remarkBytesList.length > 32 ) {
+				console.log("remark will be slice from ", remarkBytesList.length , " to 32");
 				remarkBytesList = remarkBytesList.slice( 0, 32 );
 			}
 			remarkBytes.set( remarkBytesList );

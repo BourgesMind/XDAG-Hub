@@ -25,7 +25,6 @@ import { useExplorerLink } from "_src/ui/app/hooks/useExplorerLink";
 import { logout } from "_src/ui/app/redux/slices/account";
 import { ConfirmationModal } from "_src/ui/app/shared/ConfirmationModal";
 import { Link } from "_src/ui/app/shared/Link";
-import FaucetRequestButton from "_src/ui/app/shared/faucet/FaucetRequestButton";
 import { Text } from "_src/ui/app/shared/text";
 import { formatAddress } from "_src/xdag/typescript/utils";
 import { useTranslation } from "react-i18next";
@@ -97,9 +96,6 @@ function MenuList() {
 						}
 						href={ FAQ_LINK }
 					/>
-				</div>
-				<div className="flex flex-col items-stretch mt-2.5">
-					<FaucetRequestButton variant="outline"/>
 				</div>
 				<div className="flex-1"/>
 				<div className="flex flex-nowrap flex-row items-stretch gap-3 mt-2.5">

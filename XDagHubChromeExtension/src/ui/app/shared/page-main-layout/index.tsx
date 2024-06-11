@@ -11,7 +11,7 @@ import Navigation from "_components/navigation";
 
 import st from "./PageMainLayout.module.scss";
 
-export const PageMainLayoutContext = createContext<HTMLDivElement | null>( null );
+export const PageMainLayoutContext = createContext<HTMLDivElement | null>(null);
 
 export type PageMainLayoutProps = {
 	children: ReactNode | ReactNode[];
@@ -21,33 +21,33 @@ export type PageMainLayoutProps = {
 	className?: string;
 };
 
-export default function PageMainLayout( {
-																					children,
-																					bottomNavEnabled = false,
-																					topNavMenuEnabled = false,
-																					dappStatusEnabled = false,
-																					className,
-																				}: PageMainLayoutProps ) {
-	const networkName = useAppSelector( ( { app: { apiEnv } } ) => apiEnv );
-	const appType = useAppSelector( ( state ) => state.app.appType );
+export default function PageMainLayout({
+	children,
+	bottomNavEnabled = false,
+	topNavMenuEnabled = false,
+	dappStatusEnabled = false,
+	className,
+}: PageMainLayoutProps) {
+	const networkName = useAppSelector(({ app: { apiEnv } }) => apiEnv);
+	const appType = useAppSelector((state) => state.app.appType);
 	const isFullScreen = appType === AppType.fullscreen;
-	const [ titlePortalContainer, setTitlePortalContainer ] = useState<HTMLDivElement | null>( null );
+	const [titlePortalContainer, setTitlePortalContainer] = useState<HTMLDivElement | null>(null);
 	return (
-		<div className={ cl( st.container, { [ st.fullScreenContainer ]: isFullScreen, } ) }>
+		<div className={cl(st.container, { [st.fullScreenContainer]: isFullScreen, })}>
 			<Header
-				networkName={ networkName }
-				middleContent={ dappStatusEnabled ? <DappStatus/> : <div ref={ setTitlePortalContainer }/> }
-				rightContent={ <MenuButton showSetting={ topNavMenuEnabled }/> }
+				networkName={networkName}
+				middleContent={dappStatusEnabled ? <DappStatus /> : <div ref={setTitlePortalContainer} />}
+				rightContent={<MenuButton showSetting={topNavMenuEnabled} />}
 			/>
-			<div className={ cl( st.content, { [ st.fullScreenContent ]: isFullScreen, } ) }>
-				<main className={ cl( st.main, { [ st.withNav ]: bottomNavEnabled }, className ) }>
-					<PageMainLayoutContext.Provider value={ titlePortalContainer }>
-						<ErrorBoundary>{ children }</ErrorBoundary>
+			<div className={cl(st.content, { [st.fullScreenContent]: isFullScreen, })}>
+				<main className={cl(st.main, { [st.withNav]: bottomNavEnabled }, className)}>
+					<PageMainLayoutContext.Provider value={titlePortalContainer}>
+						<ErrorBoundary>{children}</ErrorBoundary>
 					</PageMainLayoutContext.Provider>
 				</main>
-				{ bottomNavEnabled ? <Navigation/> : null }
-				{ topNavMenuEnabled ? <MenuContent/> : null }
-				<Toaster bottomNavEnabled={ bottomNavEnabled }/>
+				{bottomNavEnabled ? <Navigation /> : null}
+				{topNavMenuEnabled ? <MenuContent /> : null}
+				<Toaster bottomNavEnabled={bottomNavEnabled} />
 			</div>
 		</div>
 	);
