@@ -6,9 +6,9 @@ import { AppType } from "../redux/slices/app/AppType";
 export function useInitialPageView() {
   const activeAccount = useActiveAccount();
   const location = useLocation();
-  const { apiEnv, customRPC, activeOrigin, appType } = useAppSelector(
+  const { apiEnv, fullNode, activeOrigin, appType } = useAppSelector(
     (state) => state.app,
   );
-  const activeNetwork = customRPC && apiEnv === "customRPC" ? customRPC : apiEnv.toUpperCase();
+  const activeNetwork = fullNode && apiEnv === "customRPC" ? fullNode : apiEnv.toUpperCase();
   const isFullScreen = appType === AppType.fullscreen;
 }

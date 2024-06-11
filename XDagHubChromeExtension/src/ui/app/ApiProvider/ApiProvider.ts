@@ -6,10 +6,11 @@ import {
 	type SerializedAccount,
 } from "_src/background/keyring/Account";
 import { API_ENV } from "_shared/api-env";
-import { Connection, JsonRpcProvider } from "_src/xdag/typescript/rpc";
+import { Connection, JsonRpcProvider, localnetConnection, mainnetConnection, testnetConnection } from "_src/xdag/typescript/rpc";
 import type { BackgroundClient } from "_app/background-client";
 import type { SignerWithProvider } from "_src/xdag/typescript/signers";
 import type { XDagAddress } from "_src/xdag/typescript/types";
+
 
 type EnvInfo = {
 	name: string;
@@ -24,15 +25,23 @@ export const API_ENV_TO_INFO: Record<API_ENV, EnvInfo> = {
 	[API_ENV.mainnet]: { name: "Mainnet", env: API_ENV.mainnet },
 };
 
+
+// export const ENV_TO_API: Record<API_ENV, Connection | null> = {
+// 	[API_ENV.customRPC]: null,
+// 	[API_ENV.local]: localnetConnection  new Connection({ fullnode: process.env.API_ENDPOINT_LOCAL_FULLNODE || "", }),
+// 	// [API_ENV.devNet]: new Connection({ fullnode: process.env.API_ENDPOINT_DEV_NET_FULLNODE || "", }),
+// 	[API_ENV.testNet]: new Connection({ fullnode: process.env.API_ENDPOINT_TEST_NET_FULLNODE || "", }),
+// 	[API_ENV.mainnet]: new Connection({ fullnode: process.env.API_ENDPOINT_MAINNET_FULLNODE || "", }),
+// };
 export const ENV_TO_API: Record<API_ENV, Connection | null> = {
 	[API_ENV.customRPC]: null,
-	[API_ENV.local]: new Connection({ fullnode: process.env.API_ENDPOINT_LOCAL_FULLNODE || "", }),
-	// [API_ENV.devNet]: new Connection({ fullnode: process.env.API_ENDPOINT_DEV_NET_FULLNODE || "", }),
-	[API_ENV.testNet]: new Connection({ fullnode: process.env.API_ENDPOINT_TEST_NET_FULLNODE || "", }),
-	[API_ENV.mainnet]: new Connection({ fullnode: process.env.API_ENDPOINT_MAINNET_FULLNODE || "", }),
+	[API_ENV.local]: localnetConnection,
+	[API_ENV.testNet]: testnetConnection,
+	[API_ENV.mainnet]: mainnetConnection,
 };
 
-function getDefaultApiEnv() {
+
+export function getDefaultApiEnv() {
 	const apiEnv = process.env.API_ENV;
 	if (apiEnv && !Object.keys(API_ENV).includes(apiEnv)) {
 		throw new Error(`Unknown environment variable API_ENV, ${apiEnv}`);
@@ -40,7 +49,7 @@ function getDefaultApiEnv() {
 	return apiEnv ? API_ENV[apiEnv as keyof typeof API_ENV] : API_ENV.mainnet;
 }
 
-function getDefaultAPI(env: API_ENV) {
+export function getConnectionAPI(env: API_ENV) {
 	const apiNode = ENV_TO_API[env];
 	if (!apiNode || apiNode.fullnode === "") {
 		throw new Error(`API endpoint not found for API_ENV ${env}`);
@@ -49,7 +58,6 @@ function getDefaultAPI(env: API_ENV) {
 }
 
 export const DEFAULT_API_ENV = getDefaultApiEnv();
-const SENTRY_MONITORED_ENVS = [API_ENV.mainnet];
 
 type NetworkTypes = keyof typeof API_ENV;
 
@@ -62,7 +70,7 @@ export default class ApiProvider {
 	private _signerByAddress: Map<XDagAddress, SignerWithProvider> = new Map();
 
 	public setNewJsonRpcProvider(apiEnv: API_ENV = DEFAULT_API_ENV, customRPC?: string | null,) {
-		const connection = customRPC ? new Connection({ fullnode: customRPC }) : getDefaultAPI(apiEnv);
+		const connection = customRPC ? new Connection({ fullnode: customRPC }) : getConnectionAPI(apiEnv);
 		this._apiFullNodeProvider = new JsonRpcProvider(connection, { rpcClient: undefined, });
 		this._signerByAddress.clear();
 		// We also clear the query client whenever set set a new API provider:

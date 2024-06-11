@@ -1,5 +1,4 @@
-// Copyright (c) XdagEcoSystem.
-// SPDX-License-Identifier: Apache-2.0
+
 module.exports = {
   plugins: [],
   extends: ["eslint:recommended", "react-app", "plugin:import/typescript"],
@@ -31,9 +30,10 @@ module.exports = {
     "@tanstack/query/exhaustive-deps": "off",
     "no-useless-catch": "off",
     "no-case-declarations": "off",
-    "no-mixed-spaces-and-tabs":"off",
+    "no-mixed-spaces-and-tabs": "off",
     "no-debugger": "off",
-    " no-prototype-builtins":"off"
+    " no-prototype-builtins": "off"
   },
   overrides: [],
+  parser: "@babel/eslint-parser",
 };

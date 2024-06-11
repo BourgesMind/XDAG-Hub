@@ -43,28 +43,28 @@ function renderApp() {
 
 function AppWrapper() {
   const network = useAppSelector(
-    ({ app: { apiEnv, customRPC } }) => `${apiEnv}_${customRPC}`,
+    ({ app: { apiEnv, fullNode } }) => `${apiEnv}_${fullNode}`,
   );
   return (
-      <HashRouter>
-        <>
-          <Fragment key={network}>
-            <PersistQueryClientProvider
-              client={queryClient}
-              persistOptions={{
-                persister,
-                dehydrateOptions: { shouldDehydrateQuery: ({ meta }) => !meta?.skipPersistedCache, },
-              }}
-            >
-              <RpcClientContext.Provider value={api.instance.fullNode}>
-                <ErrorBoundary>
-                  <App />
-                </ErrorBoundary>
-              </RpcClientContext.Provider>
-            </PersistQueryClientProvider>
-          </Fragment>
-        </>
-      </HashRouter>
+    <HashRouter>
+      <>
+        <Fragment key={network}>
+          <PersistQueryClientProvider
+            client={queryClient}
+            persistOptions={{
+              persister,
+              dehydrateOptions: { shouldDehydrateQuery: ({ meta }) => !meta?.skipPersistedCache, },
+            }}
+          >
+            <RpcClientContext.Provider value={api.instance.fullNode}>
+              <ErrorBoundary>
+                <App />
+              </ErrorBoundary>
+            </RpcClientContext.Provider>
+          </PersistQueryClientProvider>
+        </Fragment>
+      </>
+    </HashRouter>
   );
 }
 

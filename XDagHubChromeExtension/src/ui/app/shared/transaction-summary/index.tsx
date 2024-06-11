@@ -1,8 +1,15 @@
 import clsx from "classnames";
 import { ExplorerLinkCard } from "./cards/ExplorerLink";
 import LoadingIndicator from "../../components/loading/LoadingIndicator";
-import { Heading } from "../heading";
-import type { TransactionSummary as TransactionSummaryType } from "_shared/utils";
+import type { XDagAddress } from "_src/xdag/typescript/types";
+
+export type TransactionSummaryType = {
+  digest?: string;
+  sender?: XDagAddress;
+  timestamp?: string;
+  gas?: any;
+} | null;
+
 
 export function TransactionSummary({
   summary,

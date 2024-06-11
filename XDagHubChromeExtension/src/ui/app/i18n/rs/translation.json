@@ -152,9 +152,17 @@
     "MightFailWarning": "Эта транзакция переведет ваши монеты и может завершиться неудачно. Вы уверены, что все равно хотите утвердить транзакцию?",
     "ChargedGasFeeWarning": "Вам все равно будет взиматься плата за газ по протоколу XDag."
   },
+  "InscriptionRequest": {
+    "PageTitle": "Надпись",
+    "Approve": "Одобрить",
+    "Reject": "Отклонить",
+    "ApproveTransaction": "Одобрить транзакцию",
+    "MightFailWarning": "Эта транзакция содержит пакетные транзакции, одобрение означает, что все транзакции будут выполнены.",
+    "ChargedGasFeeWarning": "Перевод XDAG и комиссии за газ уже включены в эту транзакцию."
+  },
   "DAppInfoCard": {
     "ViewWebsite": "Посмотреть сайт",
-    "ConnectedAccount": "Подключенный счёт"
+    "ConnectedAccount": "Кому"
   },
   "GasFees": {
     "EstimatedGasFees": "Примерная плата за газ",
@@ -232,12 +240,15 @@
     "TransactionStatus": "Статус транзакции"
   },
   "TransactionStatus": {
+    "Pushing": "Отправка",
     "Pending": "В ожидании",
     "Accepted": "Принято",
     "Rejected": "Отклонено",
     "BlinkingUntilBlockchainAccepted": "Мигает, пока не будет принято блокчейном",
     "WillTakeAbout5Minutes": "Займет примерно 5 минут...",
-    "CanLeaveOrViewOnExplorerOrWaitHere": "Можете уйти, посмотреть в проводнике или подождать здесь"
+    "CanLeaveOrViewOnExplorerOrWaitHere": "Можете уйти, посмотреть в проводнике или подождать здесь",
+    "BatchTxProcessingDontLeave": "Обработка пакета транзакций, не закрывайте окно, пожалуйста, подождите!",
+    "PushBatchTo": "Отправить пакет транзакций в"
   },
   "ExplorerLinkCard": {
     "ViewOnExplorer": "Посмотреть в проводнике"
@@ -286,5 +297,13 @@
     "ShouldBeGreaterThan0": "Должно быть больше 0 {{_Symbol}}",
     "MustBeLessThan": " должно быть меньше {{_BalanceText}}",
     "ExceedsMaximumDecimals": "Значение превышает максимально допустимое количество десятичных знаков {{_Decimals}}"
+  },
+  "InscriptionDetails": {
+    "Header": "Текстовая надпись",
+    "Chunks": "Количество фрагментов",
+    "Gas": "Газовая плата",
+    "Award": "Стоимость награды",
+    "TotalCost": "Общая стоимость",
+    "insufficientBalance": "Недостаточный баланс для покрытия общей стоимости транзакции"
   }
 }

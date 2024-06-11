@@ -116,7 +116,7 @@ if (!isSessionStorageSupported()) {
   });
 }
 
-NetworkEnv.getActiveNetwork().then(async ({ env, customRpcUrl }) => {
+NetworkEnv.getActiveNetwork().then(async ({ env, fullNode }) => {
 });
 
 NetworkEnv.on("changed", async (network) => {

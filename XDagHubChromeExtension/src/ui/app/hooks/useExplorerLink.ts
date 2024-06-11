@@ -26,16 +26,16 @@ export function useExplorerLink(linkConfig: ExplorerLinkConfig) {
   const address = useAddress(linkConfig);
   const [selectedApiEnv, customRPC] = useAppSelector(({ app }) => [
     app.apiEnv,
-    app.customRPC,
+    app.fullNode,
   ]);
   const transactionID = type === ExplorerLinkType.transaction ? linkConfig.transactionID : null;
-  const customRPCUrl = customRPC || "http://localhost:3000/";
+  const customFullNode = customRPC ?? "";
   return useMemo(() => {
     switch (type) {
       case ExplorerLinkType.address:
-        return address && getMainBlockUrl(address, selectedApiEnv, customRPCUrl);
+        return address && getMainBlockUrl(address, selectedApiEnv, customFullNode);
       case ExplorerLinkType.transaction:
-        return (transactionID && getTransactionUrl(transactionID, selectedApiEnv, customRPCUrl));
+        return (transactionID && getTransactionUrl(transactionID, selectedApiEnv, customFullNode));
     }
-  }, [type, address, selectedApiEnv, customRPCUrl, transactionID]);
+  }, [type, address, selectedApiEnv, customFullNode, transactionID]);
 }

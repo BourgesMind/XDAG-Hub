@@ -39,3 +39,9 @@ export function useTransactionGasBudget(
 		...rest,
 	};
 }
+
+export const useGasFee = ():BigNumber=> {
+	return new BigNumber(0.1);
+}
+
+

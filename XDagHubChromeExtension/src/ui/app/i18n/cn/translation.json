@@ -151,9 +151,17 @@
     "MightFailWarning": "此交易会转移货币但也可能会失败。您确定还要批准该交易吗？",
     "ChargedGasFeeWarning": "在此交易中，您有可能会根据XDAG区块链要求支付额外的燃料费用。"
   },
+  "InscriptionRequest": {
+    "PageTitle": "铭刻",
+    "Approve": "批准",
+    "Reject": "拒绝",
+    "ApproveTransaction": "批准交易",
+    "MightFailWarning": "此交易包含批量交易，批准意味着所有交易会执行。",
+    "ChargedGasFeeWarning": "在此交易中已经包含了XDAG的转移以及燃料费用"
+  },
   "DAppInfoCard": {
     "ViewWebsite": "查看发起站点",
-    "ConnectedAccount": "交易账号"
+    "ConnectedAccount": "交易去向"
   },
   "GasFees": {
     "EstimatedGasFees": "燃料费估算",
@@ -225,22 +233,20 @@
     "available": "可用余额"
   },
   "ReceiptPage": {
-    "TransactionFailed": "Transaction Failed",
-    "SomethingWentWrong": "Something went wrong"
-  },
-  "----": {},
-  "ReceiptPage": {
     "TransactionFailed": "交易失败",
     "SomethingWentWrong": "发生了一些错误",
     "TransactionStatus": "交易状态"
   },
   "TransactionStatus": {
+    "Pushing": "推送中",
     "Pending": "待接受",
     "Accepted": "已接受",
     "Rejected": "已拒绝",
     "BlinkingUntilBlockchainAccepted": "会一直闪动到被区块链确认接受",
     "WillTakeAbout5Minutes": "将花费5分钟左右...",
-    "CanLeaveOrViewOnExplorerOrWaitHere": "可以等待也可以离开或者去区块链上浏览器上查看"
+    "CanLeaveOrViewOnExplorerOrWaitHere": "可以等待也可以离开或者去区块链上浏览器上查看",
+    "BatchTxProcessingDontLeave": "请勿关闭窗口，保持等待！",
+    "PushBatchTo": "推送批量交易到"
   },
   "ExplorerLinkCard": {
     "ViewOnExplorer": "在区块链浏览器上查看"
@@ -253,9 +259,9 @@
     "EstimatedGasFees": "预估燃料费用"
   },
   "AppsPlayGround": {
-  "XDagApps": "XDAG应用",
-  "DoYouOwnResearch": "以下应用程序经过积极筛选，但并不代表本钱包对其任何认可或有任何关系。请自行了解(DYOR)"
-},
+    "XDagApps": "XDAG应用",
+    "DoYouOwnResearch": "以下应用程序经过积极筛选，但并不代表本钱包对其任何认可或有任何关系。请自行了解(DYOR)"
+  },
   "CompletedTransactions": {
     "transactionsWillShowHere": "您的XDAG交易将显示在此处。"
   },
@@ -288,5 +294,13 @@
     "ShouldBeGreaterThan0": "必须大于0 {{_Symbol}}",
     "MustBeLessThan": "必须小于 {{_BalanceText}}",
     "ExceedsMaximumDecimals": "值超过最大小数位数 {{_Decimals}}"
+  },
+  "InscriptionDetails": {
+    "Header": "文本刻入",
+    "Chunks": "小块数量",
+    "Gas": "燃料费用",
+    "Award": "额外费用",
+    "TotalCost": "总体费用",
+    "insufficientBalance": "账户余额不足以支付交易总费用"
   }
 }

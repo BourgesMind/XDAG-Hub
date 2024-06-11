@@ -13,7 +13,6 @@ import Alert from "_components/alert";
 import Loading from "_components/loading";
 import { parseAmount } from "_helpers";
 import { useGetAllCoins } from "_hooks";
-import { GAS_SYMBOL } from "_redux/slices/xdag-objects/Coin";
 import {
 	useCoinMetadata,
 	useFormatCoin,
@@ -21,7 +20,7 @@ import {
 } from "_shared/hooks";
 import { InputWithAction } from "_src/ui/app/shared/InputWithAction";
 import { type CoinStruct } from "_src/xdag/typescript/types";
-import { XDAG_TYPE_ARG, Coin as CoinAPI, } from "_src/xdag/typescript/framework";
+import { XDAG_TYPE_ARG, CoinAPI, } from "_src/xdag/typescript/framework";
 import { useRpcClient } from "_src/xdag/api";
 import BigNumber from "bignumber.js";
 import { RemarkInput } from "_components/remark-input";
@@ -49,90 +48,90 @@ export type SubmitProps = {
 
 export type SendTokenFormProps = {
 	coinType: string;
-	onSubmit: ( values: SubmitProps ) => void;
+	onSubmit: (values: SubmitProps) => void;
 	initialAmount: string;
 	initialTo: string;
 	initialRemark: string;
 };
 
-export function SendTokenForm( { coinType, onSubmit, initialAmount = "", initialTo = "", initialRemark = "" }: SendTokenFormProps ) {
+export function SendTokenForm({ coinType, onSubmit, initialAmount = "", initialTo = "", initialRemark = "" }: SendTokenFormProps) {
 	const rpc = useRpcClient();
 	const activeAddress = useActiveAddress();
 
 	const { t } = useTranslation();
 
 	// Get all coins of the type
-	const { data: coinsData, isLoading: coinsIsLoading } = useGetAllCoins( coinType, activeAddress!, );
-	const { data: XDagCoinsData, isLoading: XDagCoinsIsLoading } = useGetAllCoins( XDAG_TYPE_ARG, activeAddress!, );
+	const { data: coinsData, isLoading: coinsIsLoading } = useGetAllCoins(coinType, activeAddress!,);
+	const { data: XDagCoinsData, isLoading: XDagCoinsIsLoading } = useGetAllCoins(XDAG_TYPE_ARG, activeAddress!,);
 
 	const XDagCoins = XDagCoinsData;
 	const coins = coinsData;
-	const coinBalance = CoinAPI.totalBalance( coins || [] );
-	const XDagBalance = CoinAPI.totalBalance( XDagCoins || [] );
+	const coinBalance = CoinAPI.totalBalance(coins || []);
+	const XDagBalance = CoinAPI.totalBalance(XDagCoins || []);
 
-	const coinMetadata = useCoinMetadata( coinType );
+	const coinMetadata = useCoinMetadata(coinType);
 	const coinDecimals = coinMetadata.data?.decimals ?? 0;
 
-	const [ tokenBalance, symbol, queryResult ] = useFormatCoin(
-		BigNumber( coinBalance.toString() ),
+	const [tokenBalance, symbol, queryResult] = useFormatCoin(
+		BigNumber(coinBalance.toString()),
 		coinType,
 		CoinFormat.FULL,
 	);
 
-	const validationSchemaStepOne = useMemo( () => createValidationSchemaStepOne(
-			rpc,
-			coinBalance,
-			symbol,
-			coinDecimals,
-		), [ rpc, coinBalance, symbol, coinDecimals ],
+	const validationSchemaStepOne = useMemo(() => createValidationSchemaStepOne(
+		rpc,
+		coinBalance,
+		symbol,
+		coinDecimals,
+	), [rpc, coinBalance, symbol, coinDecimals],
 	);
 
 	// remove the comma from the token balance
-	const formattedTokenBalance = tokenBalance.replace( /,/g, "" );
-	const initAmountBig = parseAmount( initialAmount, coinDecimals );
+	const formattedTokenBalance = tokenBalance.replace(/,/g, "");
+	const initAmountBig = parseAmount(initialAmount, coinDecimals);
 
-	const onSubmitEvent = async ( { to, amount, isPayAllXDag, gasBudgetEst, remark }: FormValues ) => {
-		if ( !coins || !XDagCoins ) return;
-		const coinsIDs = [ ...coins ]
-			.sort( ( a, b ) => Number( b.balance ) - Number( a.balance ) )
-			.map( ( { coinObjectId } ) => coinObjectId );
+	const onSubmitEvent = async ({ to, amount, isPayAllXDag, gasBudgetEst, remark }: FormValues) => {
+		if (!coins || !XDagCoins) return;
+		const coinsIDs = [...coins]
+			.sort((a, b) => Number(b.balance) - Number(a.balance))
+			.map(({ coinObjectId }) => coinObjectId);
 		const data = { to, amount, isPayAllXDag, coins, coinIds: coinsIDs, gasBudgetEst, remark };
-		onSubmit( data );
+		onSubmit(data);
 	}
 
-	const hasEnoughBalance = ( values: any ) => {
-		if ( !(values.amount) ) return true;
-		if ( values.isPayAllXDag ) return true;
-		return XDagBalance.isGreaterThanOrEqualTo(parseAmount( values.amount, 0 ));
+	const hasEnoughBalance = (values: any) => {
+		if (!(values.amount)) return true;
+		if (values.isPayAllXDag) return true;
+		return XDagBalance.isGreaterThanOrEqualTo(parseAmount(values.amount, 0));
 	}
 
 
 	return (
-		<Loading loading={ queryResult.isLoading || coinMetadata.isLoading || XDagCoinsIsLoading || coinsIsLoading }>
+		<Loading loading={queryResult.isLoading || coinMetadata.isLoading || XDagCoinsIsLoading || coinsIsLoading}>
 			<Formik
-				initialValues={ {
+				initialValues={{
 					amount: initialAmount,
 					to: initialTo,
 					isPayAllXDag: !!initAmountBig && initAmountBig === coinBalance && coinType === XDAG_TYPE_ARG,
 					gasBudgetEst: "",
 					remark: initialRemark,
-				} }
-				validationSchema={ validationSchemaStepOne }
+				}}
+				validationSchema={validationSchemaStepOne}
 				enableReinitialize
 				validateOnMount
 				validateOnChange
-				onSubmit={ onSubmitEvent }
+				onSubmit={onSubmitEvent}
 			>
 
 
 				{
-					( { isValid, isSubmitting, setFieldValue, values, submitForm, validateField } ) => {
+					({ isValid, isSubmitting, setFieldValue, values, submitForm, validateField }) => {
 
-						const newPayXDagAll = parseAmount( values.amount, coinDecimals ) === coinBalance && coinType === XDAG_TYPE_ARG;
-						if ( values.isPayAllXDag !== newPayXDagAll ) {
-							setFieldValue( "isPayAllXDag", newPayXDagAll );
+						const newPayXDagAll = parseAmount(values.amount, coinDecimals) === coinBalance && coinType === XDAG_TYPE_ARG;
+						if (values.isPayAllXDag !== newPayXDagAll) {
+							setFieldValue("isPayAllXDag", newPayXDagAll);
 						}
-						const enough = hasEnoughBalance( values );
+						const enough = hasEnoughBalance(values);
 
 						return (
 							<BottomMenuLayout>
@@ -141,7 +140,7 @@ export function SendTokenForm( { coinType, onSubmit, initialAmount = "", initial
 										<div className="w-full flex flex-col flex-grow">
 											<div className="px-2 mb-2.5">
 												<Text variant="caption" color="steel" weight="semibold">
-													{ t( "SendTokenForm.SelectCoinAmountToSend" ) }
+													{t("SendTokenForm.SelectCoinAmountToSend")}
 												</Text>
 											</div>
 											<InputWithAction
@@ -149,42 +148,42 @@ export function SendTokenForm( { coinType, onSubmit, initialAmount = "", initial
 												type="numberInput"
 												name="amount"
 												placeholder="0.00"
-												prefix={ values.isPayAllXDag ? "~ " : "" }
+												prefix={values.isPayAllXDag ? "~ " : ""}
 												actionText="Max"
-												suffix={ ` ${ symbol }` }
+												suffix={` ${symbol}`}
 												actionType="button"
-												allowNegative={ false }
+												allowNegative={false}
 												decimals
 												rounded="lg"
 												dark
-												onActionClicked={ async () => {
+												onActionClicked={async () => {
 													// using await to make sure the value is set before the validation
-													await setFieldValue( "amount", formattedTokenBalance );
-													validateField( "amount" );
-												} }
-												actionDisabled={ parseAmount( values?.amount, coinDecimals ) === coinBalance || queryResult.isLoading || !coinBalance }
+													await setFieldValue("amount", formattedTokenBalance);
+													validateField("amount");
+												}}
+												actionDisabled={parseAmount(values?.amount, coinDecimals) === coinBalance || queryResult.isLoading || !coinBalance}
 											/>
 										</div>
 
-										{ !enough ? (
+										{!enough ? (
 											<div className="mt-3">
-												<Alert>{ t( "SendTokenForm.InsufficientXDAGToCoverTransaction" ) }</Alert>
+												<Alert>{t("SendTokenForm.InsufficientXDAGToCoverTransaction")}</Alert>
 											</div>
-										) : null }
+										) : null}
 
-										{/*{ coins ? (<GasBudgetEstimation coinDecimals={ coinDecimals } coins={ coins }/>) : null }*/ }
+										{/*{ coins ? (<GasBudgetEstimation coinDecimals={ coinDecimals } coins={ coins }/>) : null }*/}
 
 										<div className="w-full flex gap-2.5 flex-col mt-7.5">
 											<div className="px-2 tracking-wider">
 												<Text variant="caption" color="steel" weight="semibold">
-													{ t( "SendTokenForm.EnterRecipientAddress" ) }
+													{t("SendTokenForm.EnterRecipientAddress")}
 												</Text>
 											</div>
 											<div className="w-full flex relative items-center flex-col">
 												<Field
-													component={ AddressInput }
+													component={AddressInput}
 													name="to"
-													placeholder={ t( "SendTokenForm.EnterAddress" ) }
+													placeholder={t("SendTokenForm.EnterAddress")}
 												/>
 											</div>
 										</div>
@@ -193,14 +192,14 @@ export function SendTokenForm( { coinType, onSubmit, initialAmount = "", initial
 										<div className="w-full flex gap-2.5 flex-col mt-7.5">
 											<div className="px-2 tracking-wider">
 												<Text variant="caption" color="steel" weight="semibold">
-													{ t( "SendTokenForm.EnterRemark" ) }
+													{t("SendTokenForm.EnterRemark")}
 												</Text>
 											</div>
 											<div className="w-full flex relative items-center flex-col">
 												<Field
-													component={ RemarkInput }
+													component={RemarkInput}
 													name="remark"
-													placeholder={ t( "SendTokenForm.Limited32Chars" ) }
+													placeholder={t("SendTokenForm.Limited32Chars")}
 												/>
 											</div>
 										</div>
@@ -211,13 +210,13 @@ export function SendTokenForm( { coinType, onSubmit, initialAmount = "", initial
 								<Menu stuckClass="sendCoin-cta" className="w-full px-0 pb-0 mx-0 gap-2.5">
 									<Button
 										type="submit"
-										onClick={ submitForm }
+										onClick={submitForm}
 										variant="primary"
-										loading={ isSubmitting }
-										disabled={ !isValid || isSubmitting || !enough }
+										loading={isSubmitting}
+										disabled={!isValid || isSubmitting || !enough}
 										size="tall"
-										text={ t( "SendTokenForm.Review" ) }
-										after={ <ArrowRight16/> }
+										text={t("SendTokenForm.Review")}
+										after={<ArrowRight16 />}
 									/>
 								</Menu>
 							</BottomMenuLayout>

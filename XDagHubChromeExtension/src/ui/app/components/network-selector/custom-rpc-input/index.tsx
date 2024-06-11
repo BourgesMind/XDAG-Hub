@@ -21,9 +21,9 @@ const validation = Yup.object({
 });
 
 export function CustomRPCInput() {
-  const placeholder = "http://localhost:3000/";
+  const placeholder = "";
 
-  const customRPC = useAppSelector(({ app }) => app.customRPC || "");
+  const customRPC = useAppSelector(({ app }) => app.fullNode ?? "");
 
   const dispatch = useAppDispatch();
 
@@ -34,7 +34,7 @@ export function CustomRPCInput() {
           changeActiveNetwork({
             network: {
               env: API_ENV.customRPC,
-              customRpcUrl: rpcInput,
+              fullNode: rpcInput
             },
             store: true,
           }),

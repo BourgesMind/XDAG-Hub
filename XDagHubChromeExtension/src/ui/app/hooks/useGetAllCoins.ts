@@ -2,9 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useRpcClient } from "_src/xdag/api";
 import type { XDagAddress, PaginatedCoins, CoinStruct } from "_src/xdag/typescript/types";
 
-const MAX_COINS_PER_REQUEST = 100;
-
-// Fetch all coins for an address, this will keep calling the API until all coins are fetched
 export function useGetAllCoins(coinType: string, address?: XDagAddress | null) {
   const rpc = useRpcClient();
   return useQuery({
@@ -12,7 +9,6 @@ export function useGetAllCoins(coinType: string, address?: XDagAddress | null) {
     queryFn: async () => {
       let cursor: string | null = null;
       const allData: CoinStruct[] = [];
-      // keep fetching until cursor is null or undefined
       do {
         const { data, nextCursor }: PaginatedCoins = await rpc.getCoins({ owner: address!, coinType });
         if (!data || !data.length) {

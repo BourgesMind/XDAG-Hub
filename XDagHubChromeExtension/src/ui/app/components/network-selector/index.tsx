@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useMemo, useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { CustomRPCInput } from "./custom-rpc-input";
-import { API_ENV_TO_INFO, generateActiveNetworkList } from "_app/ApiProvider/ApiProvider";
+import { API_ENV_TO_INFO, generateActiveNetworkList, getConnectionAPI } from "_app/ApiProvider/ApiProvider";
 import { Check24 } from "_assets/icons/tsIcons";
 import { useAppSelector, useAppDispatch } from "_hooks";
 import { changeActiveNetwork } from "_redux/slices/app";
@@ -11,9 +11,9 @@ import { API_ENV } from "_src/shared/api-env";
 import st from "./NetworkSelector.module.scss";
 
 const NetworkSelector = () => {
-  const [activeApiEnv, activeRpcUrl] = useAppSelector(({ app }) => [
+  const [activeApiEnv, activeFullNode] = useAppSelector(({ app }) => [
     app.apiEnv,
-    app.customRPC,
+    app.fullNode,
   ]);
   const [isCustomRpcInputVisible, setCustomRpcInputVisible] = useState<boolean>(
     activeApiEnv === API_ENV.customRPC,
@@ -21,9 +21,9 @@ const NetworkSelector = () => {
   // change the selected network name whenever the selectedApiEnv changes
   useEffect(() => {
     setCustomRpcInputVisible(
-      activeApiEnv === API_ENV.customRPC && !!activeRpcUrl,
+      activeApiEnv === API_ENV.customRPC && !!activeFullNode,
     );
-  }, [activeApiEnv, activeRpcUrl]);
+  }, [activeApiEnv, activeFullNode]);
   const dispatch = useAppDispatch();
   const netWorks = useMemo(() => {
     return generateActiveNetworkList().map((itm) => ({
@@ -50,7 +50,7 @@ const NetworkSelector = () => {
                       changeActiveNetwork({
                         network: {
                           env: apiEnv.env,
-                          customRpcUrl: null,
+                          fullNode: getConnectionAPI(apiEnv.env).fullnode,
                         },
                         store: true,
                       }),
@@ -68,11 +68,10 @@ const NetworkSelector = () => {
                   st.selectedNetwork,
                   activeApiEnv === apiEnv.env && st.networkActive,
                   apiEnv.networkName === API_ENV.customRPC &&
-                    isCustomRpcInputVisible &&
-                    st.customRpcActive,
+                  isCustomRpcInputVisible &&
+                  st.customRpcActive,
                 )}
               />
-
               {apiEnv.name}
             </button>
           </li>

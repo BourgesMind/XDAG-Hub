@@ -94,7 +94,7 @@ const accountSlice = createSlice({
   name: "account",
   initialState,
   reducers: {
-    setKeyringStatus: ( state, { payload, }: PayloadAction<Required<KeyringPayload<"walletStatusUpdate">>["return"]>, ) => {
+    setKeyringStatus: (state, { payload, }: PayloadAction<Required<KeyringPayload<"walletStatusUpdate">>["return"]>,) => {
       state.isLocked = payload.isLocked;
       state.isInitialized = payload.isInitialized;
       state.address = payload.activeAddress; // is already normalized

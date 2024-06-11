@@ -1,6 +1,3 @@
-// Copyright (c) xdagEcoSystem
-// SPDX-License-Identifier: Apache-2.0
-
 import { readFile, writeFile } from "fs/promises";
 
 const LICENSE =

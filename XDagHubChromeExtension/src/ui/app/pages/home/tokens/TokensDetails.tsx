@@ -31,13 +31,12 @@ import { usePinnedCoinTypes } from "_src/ui/app/hooks/usePinnedCoinTypes";
 import { useRecognizedPackages } from "_src/ui/app/hooks/useRecognizedPackages";
 import PageTitle from "_src/ui/app/shared/PageTitle";
 import {
+	CoinAPI,
 	XDAG_TYPE_ARG,
-	Coin,
 } from "_src/xdag/typescript/framework";
 import type { CoinBalance as CoinBalanceType } from "_src/xdag/typescript/types";
 import BigNumber from "bignumber.js";
 import { useTranslation } from 'react-i18next';
-import { LanguageSelector } from "_components/language-selector";
 
 
 type TokenDetailsProps = {
@@ -200,7 +199,7 @@ function TokenDetails( { coinType }: TokenDetailsProps ) {
 	const tokenBalance = BigNumber( coinBalance?.totalBalance ?? "0" );//|| BigInt(0))
 
 	const coinSymbol = useMemo(
-		() => Coin.getCoinSymbol( activeCoinType ),
+		() => CoinAPI.getCoinSymbol( activeCoinType ),
 		[ activeCoinType ],
 	);
 	// Avoid perpetual loading state when fetching and retry keeps failing add isFetched check
@@ -271,7 +270,7 @@ function TokenDetails( { coinType }: TokenDetailsProps ) {
 							{ t( "TokenDetails.Send" ) }
 						</LargeButton>
 
-						<LargeButton center to="/" disabled={ false } top={ <Swap16/> }>
+						<LargeButton center to="/" disabled={ true } top={ <Swap16/> }>
 							{ t( "TokenDetails.Swap" ) }
 						</LargeButton>
 					</div>

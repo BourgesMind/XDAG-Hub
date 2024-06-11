@@ -17,7 +17,6 @@ import {
 import {
 	isExecuteTransactionRequest,
 	isSignTransactionRequest,
-	isStakeRequest,
 	type SignTransactionResponse,
 	type ExecuteTransactionResponse,
 } from "_payloads/transactions";
@@ -37,59 +36,54 @@ import type { PortChannelName } from "_messaging/PortChannelName";
 import type { GetAccountResponse } from "_payloads/account/GetAccountResponse";
 import type { SetNetworkPayload } from "_payloads/network";
 import type { Runtime } from "webextension-polyfill";
+import { Inscription, isExecuteInscriptionRequest } from "_src/shared/messaging/messages/payloads/inscription";
+import { inscriptionExcutor } from "../InscriptionExecutor";
+import { base64EncodeJson } from "../utils";
 
-export class ContentScriptConnection extends Connection
-{
+export class ContentScriptConnection extends Connection {
 	public static readonly CHANNEL: PortChannelName = "xdag_content<->background";
 	public readonly origin: string;
 	public readonly pagelink?: string | undefined;
 	public readonly originFavIcon: string | undefined;
 
-	constructor( port: Runtime.Port ) {
-		super( port );
-		this.origin = this.getOrigin( port );
-		this.pagelink = this.getAppUrl( port );
+	constructor(port: Runtime.Port) {
+		super(port);
+		this.origin = this.getOrigin(port);
+		this.pagelink = this.getAppUrl(port);
 		this.originFavIcon = port.sender?.tab?.favIconUrl;
 	}
 
-	protected async handleMessage( msg: Message ) {
+	protected async handleMessage(msg: Message) {
 		const { payload } = msg;
 		try {
-			if ( isGetAccount( payload ) ) {
-				const { accounts } = await this.ensurePermissions( [ "viewAccount" ] );
-				await this.sendAccounts( accounts, msg.id );
-			} else if ( isHasPermissionRequest( payload ) ) {
+			if (isGetAccount(payload)) {
+				const { accounts } = await this.ensurePermissions(["viewAccount"]);
+				await this.sendAccounts(accounts, msg.id);
+			} else if (isHasPermissionRequest(payload)) {
 				this.send(
 					createMessage<HasPermissionsResponse>(
 						{
 							type: "has-permissions-response",
-							result: await Permissions.hasPermissions(
-								this.origin,
-								payload.permissions,
-							),
+							result: await Permissions.hasPermissions(this.origin, payload.permissions),
 						},
 						msg.id,
 					),
 				);
-			} else if ( isAcquirePermissionsRequest( payload ) ) {
+			} else if (isAcquirePermissionsRequest(payload)) {
 				const permission = await Permissions.startRequestPermissions(
 					payload.permissions,
 					this,
 					msg.id,
 				);
-				if ( permission ) {
-					this.permissionReply( permission, msg.id );
+				if (permission) {
+					this.permissionReply(permission, msg.id);
 				}
-			}
-
-			// =========== dapp interface =================
-			// payload.transaction.data =  { xDagAddress: string, amount: number, remark: string }
-			else if ( isExecuteTransactionRequest( payload ) ) {
-				if ( !payload.transaction?.toAddress ) {
-					throw new Error( "Missing toAddress" );
+			} else if (isExecuteTransactionRequest(payload)) {
+				if (!payload.transaction?.toAddress) {
+					throw new Error("Missing toAddress");
 				}
 				// await this.ensurePermissions( ["viewAccount", "suggestTransactions"], payload.transaction.account, );
-				const result = await Transactions.executeOrSignTransaction( { tx: payload.transaction }, this, );
+				const result = await Transactions.executeOrSignTransaction({ tx: payload.transaction }, this,);
 				this.send(
 					createMessage<ExecuteTransactionResponse>(
 						{
@@ -99,13 +93,13 @@ export class ContentScriptConnection extends Connection
 						msg.id,
 					),
 				);
-			} else if ( isSignTransactionRequest( payload ) ) {
-				if ( !payload.transaction.account ) {
+			} else if (isSignTransactionRequest(payload)) {
+				if (!payload.transaction.account) {
 					// make sure we don't execute transactions that doesn't have a specified account
-					throw new Error( "Missing account" );
+					throw new Error("Missing account");
 				}
 				// await this.ensurePermissions( ["viewAccount", "suggestTransactions"], payload.transaction.account, );
-				const result = await Transactions.executeOrSignTransaction( { sign: payload.transaction }, this, );
+				const result = await Transactions.executeOrSignTransaction({ sign: payload.transaction }, this,);
 				this.send(
 					createMessage<SignTransactionResponse>(
 						{
@@ -115,15 +109,7 @@ export class ContentScriptConnection extends Connection
 						msg.id,
 					),
 				);
-			} else if ( isStakeRequest( payload ) ) {
-				const window = new Window(
-					Browser.runtime.getURL( "ui.html" ) +
-					`#/stake/new?address=${ encodeURIComponent(
-						payload.validatorAddress,
-					) }`,
-				);
-				await window.show();
-			} else if ( isBasePayload( payload ) && payload.type === "get-network" ) {
+			} else if (isBasePayload(payload) && payload.type === "get-network") {
 				this.send(
 					createMessage<SetNetworkPayload>(
 						{
@@ -133,22 +119,32 @@ export class ContentScriptConnection extends Connection
 						msg.id,
 					),
 				);
-			} else if ( isSignMessageRequest( payload ) && payload.args ) {
+			} else if (isSignMessageRequest(payload) && payload.args) {
 				await this.ensurePermissions(
-					[ "viewAccount", "suggestTransactions" ],
+					["viewAccount", "suggestTransactions"],
 					payload.args.accountAddress,
 				);
-				const result = await Transactions.signMessage( payload.args, this );
+				const result = await Transactions.signMessage(payload.args, this);
 				this.send(
 					createMessage<SignMessageRequest>(
 						{ type: "sign-message-request", return: result },
 						msg.id,
 					),
 				);
+			} else if (isExecuteInscriptionRequest(payload)) {
+				try {
+					const inscription: Inscription = (payload as any).inscription;
+					const inscContent = inscription.inscriptionContent;
+					inscription.inscriptionString = base64EncodeJson(inscContent);
+					console.log("inscriptionString:\n", payload, inscription.inscriptionString);
+					inscriptionExcutor.executeInscription(inscription, this);
+				} catch (error) {
+					throw new Error(`Unknown message, ${JSON.stringify(msg.payload)}`);
+				}
 			} else {
-				throw new Error( `Unknown message, ${ JSON.stringify( msg.payload ) }` );
+				throw new Error(`Unknown message, ${JSON.stringify(msg.payload)}`);
 			}
-		} catch ( e ) {
+		} catch (e) {
 			this.sendError(
 				{
 					error: true,
@@ -160,12 +156,12 @@ export class ContentScriptConnection extends Connection
 		}
 	}
 
-	public permissionReply( permission: Permission, msgID?: string ) {
-		if ( permission.origin !== this.origin ) {
+	public permissionReply(permission: Permission, msgID?: string) {
+		if (permission.origin !== this.origin) {
 			return;
 		}
 		const requestMsgID = msgID || permission.requestMsgID;
-		if ( permission.allowed ) {
+		if (permission.allowed) {
 			this.send(
 				createMessage<AcquirePermissionsResponse>(
 					{
@@ -187,20 +183,20 @@ export class ContentScriptConnection extends Connection
 		}
 	}
 
-	private getOrigin( port: Runtime.Port ) {
-		if ( port.sender?.origin ) {
+	private getOrigin(port: Runtime.Port) {
+		if (port.sender?.origin) {
 			return port.sender.origin;
 		}
-		if ( port.sender?.url ) {
-			return new URL( port.sender.url ).origin;
+		if (port.sender?.url) {
+			return new URL(port.sender.url).origin;
 		}
-		throw new Error( "[ContentScriptConnection] port doesn't include an origin" );
+		throw new Error("[ContentScriptConnection] port doesn't include an origin");
 	}
 
 	// optional field for the app link.
-	private getAppUrl( port: Runtime.Port ) {
-		if ( port.sender?.url ) {
-			return new URL( port.sender.url ).href;
+	private getAppUrl(port: Runtime.Port) {
+		if (port.sender?.url) {
+			return new URL(port.sender.url).href;
 		}
 		return undefined;
 	}
@@ -209,19 +205,19 @@ export class ContentScriptConnection extends Connection
 		error: Error,
 		responseForID?: string,
 	) {
-		this.send( createMessage( error, responseForID ) );
+		this.send(createMessage(error, responseForID));
 	}
 
-	private async sendAccounts( accounts: XDagAddress[], responseForID?: string ) {
+	private async sendAccounts(accounts: XDagAddress[], responseForID?: string) {
 		const allAccountsPublicInfo = await getStoredAccountsPublicInfo();
 		this.send(
 			createMessage<GetAccountResponse>(
 				{
 					type: "get-account-response",
-					accounts: accounts.map( ( anAddress ) => ({
+					accounts: accounts.map((anAddress) => ({
 						address: anAddress,
-						publicKey: allAccountsPublicInfo[ anAddress ]?.publicKey || null,
-					}) ),
+						publicKey: allAccountsPublicInfo[anAddress]?.publicKey || null,
+					})),
 				},
 				responseForID,
 			),
@@ -232,10 +228,10 @@ export class ContentScriptConnection extends Connection
 		permissions: PermissionType[],
 		account?: XDagAddress,
 	) {
-		const existingPermission = await Permissions.getPermission( this.origin );
-		const allowed = await Permissions.hasPermissions( this.origin, permissions, existingPermission, account, );
-		if ( !allowed || !existingPermission ) {
-			throw new Error( "Operation not allowed, dapp doesn't have the required permissions", );
+		const existingPermission = await Permissions.getPermission(this.origin);
+		const allowed = await Permissions.hasPermissions(this.origin, permissions, existingPermission, account,);
+		if (!allowed || !existingPermission) {
+			throw new Error("Operation not allowed, dapp doesn't have the required permissions",);
 		}
 		return existingPermission;
 	}

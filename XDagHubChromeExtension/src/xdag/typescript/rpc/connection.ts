@@ -22,17 +22,15 @@ export class Connection {
 }
 
 export const localnetConnection = new Connection({
-  fullnode: "http://127.0.0.1:10001",
+  fullnode:  process.env.API_ENDPOINT_LOCAL_FULLNODE || "",
 });
 
-// export const devnetConnection = new Connection({
-//   fullnode: "https://devnet-rpc.xdagj.org",
-// });
-
 export const testnetConnection = new Connection({
-  fullnode: "https://testnet-rpc.xdagj.org",
+  fullnode:  process.env.API_ENDPOINT_TEST_NET_FULLNODE || "",
 });
 
 export const mainnetConnection = new Connection({
-  fullnode: "https://mainnet-rpc.xdagj.org",
+  fullnode:  process.env.API_ENDPOINT_MAINNET_FULLNODE || "",
 });
+
+
